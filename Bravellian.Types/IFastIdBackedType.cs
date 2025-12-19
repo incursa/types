@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ public interface IFastIdBackedType<TSelf>
           ILongBackedType<TSelf>
     where TSelf : IFastIdBackedType<TSelf>
 {
-    long Value { get; }
+    new long Value { get; }
 
     Bravellian.FastId FastId { get; }
 
     static abstract TSelf From(FastId value);
 
-    static abstract TSelf From(long value);
+    new static abstract TSelf From(long value);
 }

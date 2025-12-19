@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public readonly partial record struct PhoneNumber
 
     public int CompareTo(PhoneNumber other)
     {
-        return string.Compare(Value, other.Value);
+        return string.Compare(Value, other.Value, StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)

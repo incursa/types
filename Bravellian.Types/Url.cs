@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public readonly record struct Url : IParsable<Url>
         };
 
         // Remove default ports and ensure path canonicalization
-        if ((builder.Scheme == Uri.UriSchemeHttp && builder.Port == 80) || (builder.Scheme == Uri.UriSchemeHttps && builder.Port == 443))
+        if ((string.Equals(builder.Scheme, Uri.UriSchemeHttp, StringComparison.Ordinal) && builder.Port == 80) || (string.Equals(builder.Scheme, Uri.UriSchemeHttps, StringComparison.Ordinal) && builder.Port == 443))
         {
             builder.Port = -1;
         }
