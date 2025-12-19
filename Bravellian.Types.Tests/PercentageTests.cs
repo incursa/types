@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 using Bravellian;
 using Xunit;
+
+namespace Bravellian.Types.Tests;
 
 public class PercentageTests
 {
@@ -47,8 +49,8 @@ public class PercentageTests
     }
 
     [Theory]
-    [InlineData(0.123456, "12.3456%")]
-    [InlineData(1.0, "100%")]
+    [InlineData(0.123456, "12.34%")]
+    [InlineData(1.0, "100.00%")]
     public void ToStringRaw_FormatsCorrectly(decimal input, string expected)
     {
         var pct = new Percentage(input);

@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 namespace Bravellian;
 
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Diagnostics;
@@ -23,6 +24,7 @@ using CommunityToolkit.Diagnostics;
 /// This represents an ISO 8601 Time Interval, of the format {DateTime}/{Duration}.
 /// </summary>
 [JsonConverter(typeof(PeriodJsonConverter))]
+[StructLayout(LayoutKind.Auto)]
 public readonly record struct Period
 {
     public Period(DateTimeOffset start, DateTimeOffset end)

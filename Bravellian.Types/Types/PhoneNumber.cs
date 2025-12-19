@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,16 +33,19 @@ public readonly partial record struct PhoneNumber
     private PhoneNumber(string value)
     {
         Guard.IsNotNullOrWhiteSpace(value);
-        Value = value;
-        ProcessValue(value, out string number);
+        ProcessValue(value, out string number, out string? region);
+        Value = number;
         Number = number;
+        RegionCode = region;
     }
 
     public string Value { get; init; }
 
     public string Number { get; init; }
 
-    private static partial void ProcessValue(string value, out string number);
+    public string? RegionCode { get; init; }
+
+    private static partial void ProcessValue(string value, out string number, out string? regionCode);
 
     public static PhoneNumber From(string value) => new(value);
 
@@ -60,7 +63,7 @@ public readonly partial record struct PhoneNumber
 
     public int CompareTo(PhoneNumber other)
     {
-        return string.Compare(Value, other.Value);
+        return string.Compare(Value, other.Value, StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)

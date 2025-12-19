@@ -1,4 +1,4 @@
-// CONFIDENTIAL - Copyright (c) PayeWaive LLC. All rights reserved.
+﻿// CONFIDENTIAL - Copyright (c) PayeWaive LLC. All rights reserved.
 // See NOTICE.md for full restrictions and usage terms.
 
 

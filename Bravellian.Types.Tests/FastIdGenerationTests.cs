@@ -13,6 +13,7 @@
 // limitations under the License.
 
 namespace Bravellian.Types.Tests;
+
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -35,19 +36,13 @@ public class FastIdGenerationTests
     #region Helper Method
 
     /// <summary>
-    /// Helper method to reverse the FastId generation process and extract the DateTimeOffset.
-    /// This is crucial for verifying the timestamp constraints.
+    /// Helper method to extract the timestamp component from the raw FastId value.
     /// </summary>
     private static DateTimeOffset GetTimestampFromFastId(FastId id)
     {
-        // To get the original timestamp and random parts, we must first unshuffle the bits.
-        // The provided FastId class does not expose the un-shuffled value directly, 
-        // so we must call the public UnshuffleBits method.
-        long unshuffledValue = FastId.LongBitShuffler.UnshuffleBits(id.Value);
-
+        // Value already stores the timestamp/random bits prior to encoding; no unshuffling is required.
         // The timestamp is stored in the most significant bits.
-        // We shift the value right to isolate the timestamp part.
-        ulong timestampSeconds = (ulong)unshuffledValue >> RandomBits;
+        ulong timestampSeconds = (ulong)id.Value >> RandomBits;
 
         // Convert the seconds back into a DateTimeOffset by adding them to the custom epoch.
         return CustomEpoch.AddSeconds(timestampSeconds);

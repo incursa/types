@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ public readonly partial record struct EmailAddress
     private EmailAddress(string value)
     {
         Guard.IsNotNullOrWhiteSpace(value);
-        Value = value;
-        ProcessValue(value, out System.Net.Mail.MailAddress address);
+        ProcessValue(value, out string normalizedValue, out System.Net.Mail.MailAddress address);
+        Value = normalizedValue;
         Address = address;
     }
 
@@ -42,7 +42,7 @@ public readonly partial record struct EmailAddress
 
     public System.Net.Mail.MailAddress Address { get; init; }
 
-    private static partial void ProcessValue(string value, out System.Net.Mail.MailAddress address);
+    private static partial void ProcessValue(string value, out string normalizedValue, out System.Net.Mail.MailAddress address);
 
     public static EmailAddress From(string value) => new(value);
 
@@ -60,7 +60,7 @@ public readonly partial record struct EmailAddress
 
     public int CompareTo(EmailAddress other)
     {
-        return string.Compare(Value, other.Value);
+        return string.Compare(Value, other.Value, StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)

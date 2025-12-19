@@ -318,7 +318,7 @@ public readonly partial record struct UsaState
 
     public int CompareTo(UsaState other)
     {
-        return string.Compare(Value, other.Value);
+        return string.Compare(Value, other.Value, StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)
