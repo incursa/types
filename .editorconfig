@@ -17,3 +17,23 @@ dotnet_style_prefer_var_for_complex_types = true:suggestion
 dotnet_style_prefer_var_when_type_is_apparent = true:suggestion
 dotnet_diagnostic.SA0001.severity = suggestion
 csharp_prefer_braces = true:suggestion
+
+# Meziantou Analyzer suppressions
+# MA0011: IFormatProvider - suppress as it requires significant refactoring and careful review
+dotnet_diagnostic.MA0011.severity = suggestion
+# MA0021: StringComparer for hash codes - suppress as default behavior is acceptable
+dotnet_diagnostic.MA0021.severity = suggestion
+# MA0048: File name must match type name - suppress as multiple types per file is a common pattern
+dotnet_diagnostic.MA0048.severity = suggestion
+# MA0051: Method length - suppress for generated data and large switch statements
+dotnet_diagnostic.MA0051.severity = suggestion
+# MA0097: Comparison operators - suppress as not all comparable types need full operator overloading
+dotnet_diagnostic.MA0097.severity = suggestion
+# MA0008: StructLayoutAttribute - suppress as not all structs need explicit layout
+dotnet_diagnostic.MA0008.severity = suggestion
+# MA0132: DateTimeOffset conversion - suppress as implicit conversion is acceptable in some contexts
+dotnet_diagnostic.MA0132.severity = suggestion
+# xUnit1012: Null in InlineData - suppress as testing null handling is valid
+dotnet_diagnostic.xUnit1012.severity = suggestion
+# CS8632: Nullable annotations outside nullable context - suppress as files may not have #nullable enabled
+dotnet_diagnostic.CS8632.severity = suggestion

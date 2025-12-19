@@ -1,4 +1,4 @@
-using Bravellian;
+﻿using Bravellian;
 using Xunit;
 
 namespace Bravellian.Types.Tests;

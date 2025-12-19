@@ -16,6 +16,11 @@
 		<Using Include="System.Threading.Tasks" />
 	</ItemGroup>
 
+	<!-- Suppress package compatibility warnings -->
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);NU1701</NoWarn>
+	</PropertyGroup>
+
 	<!-- Keep core project references and build tooling -->
 	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Bravellian.Database')) == false">
 		<RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />

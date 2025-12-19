@@ -13,6 +13,7 @@
 // limitations under the License.
 
 namespace Bravellian.Types.Tests;
+
 using System;
 using System.Collections.Generic;
 using Xunit;

@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 #nullable enable
 
@@ -141,6 +142,7 @@ public readonly record struct CurrencyCode : IParsable<CurrencyCode>, ISpanForma
     }
 }
 
+[StructLayout(LayoutKind.Auto)]
 internal readonly record struct CurrencyMetadata(int NumericCode, int MinorUnit);
 
 internal static class Iso4217CurrencyData
