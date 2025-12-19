@@ -71,9 +71,10 @@ dotnet format --verify-no-changes
 * **BvFile** – In-memory file payload with MIME inference and base64/path factories.
 * **Maybe<T>** – Lightweight option monad with LINQ-like combinators.
 * **Backed type interfaces** – `IStringBackedType`, `INumberBackedType`, and multi-backed variants for strongly typed IDs and values.
+* **Contact & locale** – `EmailAddress`, `PhoneNumber`, `CountryCode`, `CurrencyCode`, `Locale`, and `TimeZoneId` wrap platform data with parsing/normalization.
+* **Networking** – `Url`, `IpAddress`, and `CidrRange` provide safe parsing and containment helpers.
 
-See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md).
-Potential future primitives (e.g., `EmailAddress`, `PhoneNumber`, `CurrencyCode`, `TimeZoneId`, `Url`, CIDR ranges) are cataloged in [`docs/future-types.md`](docs/future-types.md).
+See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md). Remaining candidate primitives are cataloged in [`docs/future-types.md`](docs/future-types.md).
 
 ## Contributing
 

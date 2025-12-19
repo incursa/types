@@ -33,8 +33,8 @@ public readonly partial record struct EmailAddress
     private EmailAddress(string value)
     {
         Guard.IsNotNullOrWhiteSpace(value);
-        Value = value;
-        ProcessValue(value, out System.Net.Mail.MailAddress address);
+        ProcessValue(value, out string normalizedValue, out System.Net.Mail.MailAddress address);
+        Value = normalizedValue;
         Address = address;
     }
 
@@ -42,7 +42,7 @@ public readonly partial record struct EmailAddress
 
     public System.Net.Mail.MailAddress Address { get; init; }
 
-    private static partial void ProcessValue(string value, out System.Net.Mail.MailAddress address);
+    private static partial void ProcessValue(string value, out string normalizedValue, out System.Net.Mail.MailAddress address);
 
     public static EmailAddress From(string value) => new(value);
 

@@ -16,14 +16,40 @@ namespace Bravellian;
 
 public readonly partial record struct PhoneNumber
 {
-    private static partial void ProcessValue(string value, out string number)
+    private static partial void ProcessValue(string value, out string number, out string? regionCode)
     {
         if (value == null)
         {
             throw new ArgumentNullException(nameof(value));
         }
 
-        number = value;
+        var util = PhoneNumbers.PhoneNumberUtil.GetInstance();
+        PhoneNumbers.PhoneNumber parsed;
+
+        try
+        {
+            parsed = util.Parse(value, "US");
+        }
+        catch (PhoneNumbers.NumberParseException ex)
+        {
+            throw new FormatException("Invalid phone number", ex);
+        }
+
+        if (!util.IsPossibleNumber(parsed) || !util.IsValidNumber(parsed))
+        {
+            throw new FormatException("Invalid phone number");
+        }
+
+        string e164 = util.Format(parsed, PhoneNumbers.PhoneNumberFormat.E164);
+        string nationalNumber = util.GetNationalSignificantNumber(parsed);
+
+        if (string.IsNullOrWhiteSpace(e164) || string.IsNullOrWhiteSpace(nationalNumber) || nationalNumber.Length < 7)
+        {
+            throw new FormatException("Invalid or ambiguous phone number");
+        }
+
+        regionCode = util.GetRegionCodeForNumber(parsed);
+        number = e164;
     }
 
     //private static partial void ProcessValue(string value, out PhoneNumbers.PhoneNumber number)

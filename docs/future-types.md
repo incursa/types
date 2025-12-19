@@ -3,19 +3,17 @@
 These candidates complement the existing Bravellian.Types primitives. Each item includes suggested behaviors to validate before adding to the package surface.
 
 ## Contact and identity
-- **EmailAddress**: RFC 5322-compliant parser with normalization (lowercasing domain, Unicode punycode) and MX/hostname validation hooks.
-- **PhoneNumber**: E.164 formatting, country-aware parsing via libphonenumber-style rules, and short-code protection to avoid misinterpretation.
 - **ShortName/DisplayName**: Unicode-safe display names with length and script validation for user-facing labels.
 
 ## Locale and geography
-- **Country**/**CountryCode**: ISO 3166-1 alpha-2/alpha-3 codes with casing-insensitive parsing and localized display names.
-- **TimeZoneId**: IANA zone identifier with daylight-offset helpers and Windows time zone bridging.
-- **CurrencyCode**: ISO 4217 code with numeric code and exponent metadata for Money-style arithmetic.
-- **Locale**: BCP47 language tag value object with subtags and fallback helpers.
+- **Country**/**CountryCode**: Implemented. Future work: localized display names and optional data downloads for non-ISO territories.
+- **TimeZoneId**: Implemented. Future work: expose offset helpers and caching for hosted services.
+- **CurrencyCode**: Implemented. Future work: surface historic/withdrawn codes and tie minor-unit metadata to Money rounding utilities.
+- **Locale**: Implemented. Future work: fallback rules for private subtags and robust pluralization helpers.
 
 ## Networking
-- **Url**: Absolute/relative URL parsing with normalization and safe redirection validation.
-- **IpAddress / CidrRange**: IPv4/IPv6 parsing, containment checks, and serialization helpers for firewall rule modeling.
+- **Url**: Implemented. Future work: safe redirect validation helpers and allow/disallow list enforcement.
+- **IpAddress / CidrRange**: Implemented. Future work: IPv6 abbreviation controls and multicast/private range helpers.
 
 ## Platform integration
 - **ConnectionString**: Structured representation that can redact secrets in logging and merge environment overrides.

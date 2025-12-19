@@ -33,16 +33,19 @@ public readonly partial record struct PhoneNumber
     private PhoneNumber(string value)
     {
         Guard.IsNotNullOrWhiteSpace(value);
-        Value = value;
-        ProcessValue(value, out string number);
+        ProcessValue(value, out string number, out string? region);
+        Value = number;
         Number = number;
+        RegionCode = region;
     }
 
     public string Value { get; init; }
 
     public string Number { get; init; }
 
-    private static partial void ProcessValue(string value, out string number);
+    public string? RegionCode { get; init; }
+
+    private static partial void ProcessValue(string value, out string number, out string? regionCode);
 
     public static PhoneNumber From(string value) => new(value);
 

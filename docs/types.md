@@ -50,6 +50,21 @@ This document provides quick guidance for the most commonly used value objects. 
 * Option type with `Match`, `Select`, and `SelectMany` helpers for LINQ-style composition.
 * `None` singleton indicates absence; `Value` throws if accessed when empty.
 
+## Contact and identity
+* `EmailAddress`: RFC 5322 parsing via MimeKit with IDN/punycode normalization and lower-cased domains.
+* `PhoneNumber`: libphonenumber-backed parsing that emits E.164 strings and rejects ambiguous short codes; exposes region codes.
+
+## Locale and geography
+* `CountryCode`: ISO 3166-1 alpha-2/alpha-3 handling via `RegionInfo`, case-insensitive parsing, and accessible English names.
+* `CurrencyCode`: ISO 4217 catalog with numeric code and minor-unit metadata for Money rounding.
+* `TimeZoneId`: IANA/Windows identifier bridge powered by `TimeZoneConverter` for cross-platform scheduling.
+* `Locale`: BCP-47 language tag normalization with `CultureInfo` fallback handling for private subtags.
+
+## Networking
+* `Url`: Absolute/relative URL parsing with IDN host normalization, default port stripping, and lowercased schemes/hosts.
+* `IpAddress`: IPv4/IPv6 wrapper with typed checks and JSON/type converter support.
+* `CidrRange`: CIDR prefix validation plus `Contains` helpers for network rules.
+
 ## Backed type abstractions
 * `IStringBackedType`, `INumberBackedType`, and multi-backed interfaces enable strongly typed IDs with explicit backing primitives.
 * Combine with JSON/type converters for consistent serialization and model binding.
