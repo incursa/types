@@ -1,5 +1,6 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  
+  <Sdk Name="DotNet.ReproducibleBuilds.Isolated" />
+
 	<!-- Keep global Using directives -->
 	<ItemGroup>
 		<Using Include="System" />
@@ -32,7 +33,7 @@
 
 		<!-- Keep SourceLink, ReproducibleBuilds, GitVersion -->
 		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
-		<PackageReference Include="DotNet.ReproducibleBuilds.Isolated" PrivateAssets="All" Version="1.2.25" />
+        <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.39" PrivateAssets="All" />
 
 		<PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="4.14.0">
 			<PrivateAssets>all</PrivateAssets>

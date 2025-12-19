@@ -41,15 +41,65 @@ jobs:
       - name: Test
         run: dotnet test Bravellian.Core.slnx --no-build --configuration Release
 
-      - name: Pack library
-        run: dotnet pack Bravellian.Types/Bravellian.Types.csproj --no-build --configuration Release -p:ContinuousIntegrationBuild=true -p:PackageVersion=0.0.1-ci -o ./artifacts/repro1
-
-      - name: Repack to verify determinism
+      - name: Pack (repro 1)
         run: |
-          dotnet pack Bravellian.Types/Bravellian.Types.csproj --no-build --configuration Release -p:ContinuousIntegrationBuild=true -p:PackageVersion=0.0.1-ci -o ./artifacts/repro2
-          diff <(sha256sum artifacts/repro1/*.nupkg | sort) <(sha256sum artifacts/repro2/*.nupkg | sort)
-          ls -la artifacts/repro1
-          ls -la artifacts/repro2
+            rm -rf artifacts/repro1 artifacts/repro2
+            mkdir -p artifacts/repro1 artifacts/repro2
+            dotnet pack ./Bravellian.Types/Bravellian.Types.csproj \
+            -c Release \
+            -p:ContinuousIntegrationBuild=true \
+            -p:Deterministic=true \
+            -p:EmbedUntrackedSources=true \
+            -p:PackageVersion=0.0.1-ci \
+            -o artifacts/repro1
+
+      - name: Pack (repro 2)
+        run: |
+            dotnet pack ./Bravellian.Types/Bravellian.Types.csproj \
+            -c Release \
+            -p:ContinuousIntegrationBuild=true \
+            -p:Deterministic=true \
+            -p:EmbedUntrackedSources=true \
+            -p:PackageVersion=0.0.1-ci \
+            -o artifacts/repro2
+
+      - name: Compare nupkg hash
+        id: compare
+        run: |
+            sha256sum artifacts/repro1/*.nupkg > /tmp/repro1.sha
+            sha256sum artifacts/repro2/*.nupkg > /tmp/repro2.sha
+            diff /tmp/repro1.sha /tmp/repro2.sha
+
+      # Only if the compare fails, extract and diff the contents
+      - name: Diagnose non-deterministic nupkg
+        if: failure() && steps.compare.outcome == 'failure'
+        run: |
+            mkdir -p /tmp/p1 /tmp/p2
+            unzip -q artifacts/repro1/*.nupkg -d /tmp/p1
+            unzip -q artifacts/repro2/*.nupkg -d /tmp/p2
+
+            echo "=== file list diff ==="
+            diff -qr /tmp/p1 /tmp/p2 || true
+
+            echo "=== per-file hash diff ==="
+            ( cd /tmp/p1 && find . -type f -print0 | sort -z | xargs -0 sha256sum ) > /tmp/p1.sha
+            ( cd /tmp/p2 && find . -type f -print0 | sort -z | xargs -0 sha256sum ) > /tmp/p2.sha
+            diff /tmp/p1.sha /tmp/p2.sha || true
+
+            echo "=== done ==="
+
+      - name: Upload diagnosis artifacts
+        if: failure() && steps.compare.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+            name: nupkg-determinism-diff
+            path: |
+              /tmp/p1
+              /tmp/p2
+              /tmp/p1.sha
+              /tmp/p2.sha
+              /tmp/repro1.sha
+              /tmp/repro2.sha
 
       - name: Validate package integrity
         run: dotnet nuget verify "artifacts/repro1/*.nupkg" --verify-attributes

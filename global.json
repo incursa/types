@@ -8,6 +8,7 @@
     "Microsoft.Build.Sql": "2.0.0",
     "MSBuild.Sdk.SqlProj": "3.3.0",
     "Aspire.AppHost.Sdk": "13.0.1",
-    "MSTest.Sdk": "4.0.2"
+    "MSTest.Sdk": "4.0.2",
+    "DotNet.ReproducibleBuilds.Isolated": "1.2.39"
   }
 }
