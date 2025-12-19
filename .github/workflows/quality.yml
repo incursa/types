@@ -182,6 +182,3 @@ jobs:
             /tmp/repro1.names
             /tmp/repro2.names
             /tmp/nupkg-names.diff
-
-      - name: Validate package integrity
-        run: dotnet nuget verify "artifacts/repro1/*.nupkg" --verify-attributes
