@@ -3,6 +3,8 @@ using Bravellian;
 using Cronos;
 using Xunit;
 
+namespace Bravellian.Types.Tests;
+
 public class DurationAndPeriodTests
 {
     [Fact]

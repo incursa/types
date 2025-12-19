@@ -47,7 +47,16 @@ dotnet test
 
 # build the library only
 dotnet build Bravellian.Types/Bravellian.Types.csproj
+
+# verify formatting and StyleCop rules before committing
+dotnet format --verify-no-changes
 ```
+
+## Tooling and style
+
+* The repository ships with **StyleCop** rules (`stylecop.json`) and Roslyn analyzers; keep warnings at zero. The CI pipeline runs `dotnet format --verify-no-changes` to enforce the `.editorconfig` conventions (four-space indentation, `var` for implicit local types where clear, and UTF-8 encoding).
+* Enable XML documentation on public APIs. When adding new types, include `<summary>` and parameter remarks so reference docs stay complete.
+* Use `dotnet pack Bravellian.Types/Bravellian.Types.csproj -p:ContinuousIntegrationBuild=true -o ./artifacts` to validate the NuGet package layout locally. Packages are generated on build because `GeneratePackageOnBuild` is enabled.
 
 ## Type catalog
 
@@ -63,7 +72,8 @@ dotnet build Bravellian.Types/Bravellian.Types.csproj
 * **Maybe<T>** – Lightweight option monad with LINQ-like combinators.
 * **Backed type interfaces** – `IStringBackedType`, `INumberBackedType`, and multi-backed variants for strongly typed IDs and values.
 
-See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance.
+See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md).
+Potential future primitives (e.g., `EmailAddress`, `PhoneNumber`, `CurrencyCode`, `TimeZoneId`, `Url`, CIDR ranges) are cataloged in [`docs/future-types.md`](docs/future-types.md).
 
 ## Contributing
 

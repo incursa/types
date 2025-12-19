@@ -1,0 +1,55 @@
+name: Quality Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - release/**
+      - feature/**
+      - features/**
+      - user/**
+      - users/**
+      - hotfix/**
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Bravellian.Core.slnx
+
+      - name: Verify formatting and analyzers
+        run: dotnet format --verify-no-changes Bravellian.Core.slnx
+
+      - name: Build (deterministic)
+        run: dotnet build Bravellian.Core.slnx --no-restore --configuration Release -warnaserror -p:ContinuousIntegrationBuild=true
+
+      - name: Test
+        run: dotnet test Bravellian.Core.slnx --no-build --configuration Release
+
+      - name: Pack library
+        run: dotnet pack Bravellian.Types/Bravellian.Types.csproj --no-build --configuration Release -p:ContinuousIntegrationBuild=true -p:PackageVersion=0.0.1-ci -o ./artifacts/repro1
+
+      - name: Repack to verify determinism
+        run: |
+          dotnet pack Bravellian.Types/Bravellian.Types.csproj --no-build --configuration Release -p:ContinuousIntegrationBuild=true -p:PackageVersion=0.0.1-ci -o ./artifacts/repro2
+          diff <(sha256sum artifacts/repro1/*.nupkg | sort) <(sha256sum artifacts/repro2/*.nupkg | sort)
+          ls -la artifacts/repro1
+          ls -la artifacts/repro2
+
+      - name: Validate package integrity
+        run: dotnet nuget verify "artifacts/repro1/*.nupkg" --verify-attributes

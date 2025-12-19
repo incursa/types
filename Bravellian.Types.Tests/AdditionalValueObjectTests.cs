@@ -2,6 +2,8 @@ using System.Text;
 using Bravellian;
 using Xunit;
 
+namespace Bravellian.Types.Tests;
+
 public class AdditionalValueObjectTests
 {
     [Fact]

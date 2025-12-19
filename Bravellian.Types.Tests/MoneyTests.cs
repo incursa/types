@@ -15,6 +15,8 @@
 using Bravellian;
 using Xunit;
 
+namespace Bravellian.Types.Tests;
+
 public class MoneyTests
 {
     [Theory]
