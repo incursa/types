@@ -48,7 +48,7 @@ jobs:
           rm -rf artifacts/repro1 artifacts/repro2
           mkdir -p artifacts/repro1 artifacts/repro2
 
-          dotnet pack ./Bravellian.sln \
+          dotnet pack ./Bravellian.Core.slnx \
             -c Release \
             -p:ContinuousIntegrationBuild=true \
             -p:Deterministic=true \
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          dotnet pack ./Bravellian.sln \
+          dotnet pack ./Bravellian.Core.slnx \
             -c Release \
             -p:ContinuousIntegrationBuild=true \
             -p:Deterministic=true \
