@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>Incursa</RootNamespace>
     <PackageId>Incursa.Types</PackageId>
+    <PackageIcon>nuget_logo.png</PackageIcon>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Incursa</Authors>
     <Company>Incursa</Company>
@@ -24,6 +25,10 @@
 
   <ItemGroup>
     <Using Include="System" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\assets\nuget_logo.png" Pack="true" PackagePath="\" Link="nuget_logo.png" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
