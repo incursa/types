@@ -14,6 +14,22 @@ var roundTrip = JsonSerializer.Deserialize<JsonElement>(json);
 
 All value objects register `JsonConverter` attributes so no custom `JsonSerializerOptions` are required.
 
+### Important behavior guarantees
+* Numeric-backed value objects (`Money`, `Percentage`) serialize and parse using invariant culture.
+* Converter inputs are strict. Invalid strings throw during JSON deserialization or `TypeConverter` conversion.
+* Default instances are handled safely for core value structs and do not silently coerce bad input.
+
+## TypeConverter behavior
+```csharp
+var converter = TypeDescriptor.GetConverter(typeof(EmailAddress));
+
+// Valid
+var value = (EmailAddress)converter.ConvertFrom("user@example.com")!;
+
+// Invalid values now fail fast
+Assert.Throws<FormatException>(() => converter.ConvertFrom("not-an-email"));
+```
+
 ## EF Core value converters
 ```csharp
 // FastId as base32 string

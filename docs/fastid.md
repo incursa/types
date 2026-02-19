@@ -12,6 +12,7 @@ A monotonic timestamp produces time-ordered IDs while still allowing ~1 billion 
 * **Ordering**: IDs generated in the same process with monotonic time will sort chronologically by their encoded value.
 * **Collision risk**: 30 bits of randomness yields a 1 in ~1 billion collision probability per timestamp slice; use deterministic factories when idempotency is required.
 * **Overflow horizon**: 34 timestamp bits cover ~544 years from the custom epoch, expiring around year 2569.
+* **Safe default**: `default(FastId)` is supported and resolves to empty semantics (`Value == 0`, `Encoded == "0"`).
 
 ## Migration guidance
 * **From GUIDs**: use `FastId.FromGuidWithinTimestampRange(guid, cutoff)` to hash existing identifiers into the FastId space while constraining the timestamp to your desired maximum.
