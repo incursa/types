@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Bravellian.Core.sln",
+                "${workspaceFolder}/Incursa.Core.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -23,7 +23,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/Bravellian.Types.Tests/Bravellian.Types.Tests.csproj"
+                "${workspaceFolder}/Incursa.Types.Tests/Incursa.Types.Tests.csproj"
             ],
             "group": {
                 "kind": "test",
@@ -64,9 +64,9 @@
             "args": [
                 "nuget",
                 "push",
-                "${workspaceFolder}/Bravellian.Types/bin/Release/Bravellian.Types.${input:versionNumber}.nupkg",
+                "${workspaceFolder}/Incursa.Types/bin/Release/Incursa.Types.${input:versionNumber}.nupkg",
                 "--source",
-                "Bravellian",
+                "Incursa",
                 "--api-key",
                 "az"
             ],
