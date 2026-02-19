@@ -131,11 +131,6 @@ public readonly record struct JsonContext
 
     public static JsonContext FromObject<T>(T data)
     {
-        if (data is null)
-        {
-            return Empty();
-        }
-
         var serialized = JsonSerializer.SerializeToNode(data);
         if (serialized is null)
         {
@@ -149,25 +144,20 @@ public readonly record struct JsonContext
 
     public static JsonContext? TryParse(string value)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
         try
         {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                JsonObject? jobj = JsonNode.Parse(value)?.AsObject();
-                if (jobj is null)
-                {
-                    return null;
-                }
-
-                return new JsonContext(jobj);
-            }
+            JsonObject? jobj = JsonNode.Parse(value)?.AsObject();
+            return jobj is null ? null : new JsonContext(jobj);
         }
         catch (Exception)
         {
             return null;
         }
-
-        return null;
     }
 
     public static bool TryParse(string value, out JsonContext id)
@@ -226,14 +216,9 @@ public readonly record struct JsonContext
             return base.ConvertFrom(context, culture, value);
         }
 
-        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
-        {
-            if (value is JsonContext type && destinationType == typeof(string))
-            {
-                return type.ToString();
-            }
-
-            return base.ConvertTo(context, culture, value, destinationType);
-        }
+        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType) =>
+            value is JsonContext type && destinationType == typeof(string)
+                ? type.ToString()
+                : base.ConvertTo(context, culture, value, destinationType);
     }
 }

@@ -9,6 +9,7 @@ All notable changes to this project are documented in this file.
 - Spec-driven low-coverage test suite for `CountryCode`, `CurrencyCode`, `IpAddress`, `PhoneNumber`, `ShortCode`, and `UsaState` covering parse/tryparse, formatting, converter, and serialization contracts.
 - Wave-1 hardening test suite for `JsonContext`, `MonthOnly`, `BvFile`, `EmailAddress`, `EncryptedString`, `TimeZoneId`, `Url`, `Percentage`, and `MoneyExtensions`.
 - Wave-2 hardening test suite for `JsonContext`, `Maybe<T>`, `CidrRange`, `Money`, and `UsaState` edge-case API behavior.
+- Additional mutation-targeted assertions for `Percentage` and `TimeZoneId` comparison/converter/parse edge behavior.
 - `docs/migration-v2.md` migration guide for breaking hardening changes.
 - Spec-first behavior system under `docs/spec/` (per-type specs, compatibility decisions, and test traceability map).
 - `docs/coverage-ratchet-plan.md` for staged coverage-gate increases to the long-term target.
@@ -31,6 +32,8 @@ All notable changes to this project are documented in this file.
 - CI quality gates ratcheted to line `65%` / branch `50%`, and mutation gate expanded to wave-B scope (`Money`, `JsonContext`, `MonthOnly`) with non-zero threshold.
 - Wave-1 specifications promoted to `Approved` status for `JsonContext`, `MonthOnly`, `BvFile`, `EmailAddress`, `EncryptedString`, `TimeZoneId`, and `Url`.
 - Repository text normalization policy now enforces LF-only line endings via `.gitattributes` + `.editorconfig`.
+- Mutation hardening for wave-B types increased to `58.25%` score (`Money`, `JsonContext`, `MonthOnly`) and CI mutation thresholds were ratcheted to `break-at 35`, `threshold-low 35`, `threshold-high 55`.
+- CI mutation scope expanded to include `Percentage` and `TimeZoneId` after pilot validation (expanded five-file score `54.91%`).
 
 ### Fixed
 - Conflicting/non-project license header in `Duration`.
@@ -38,3 +41,4 @@ All notable changes to this project are documented in this file.
 - `PhoneNumber.GenerateRandom()` now returns parseable E.164 values instead of constructing invalid GUID-based values.
 - `EmailAddress.GenerateRandom()` now returns parseable canonical email values instead of constructing invalid GUID-only payloads.
 - `JsonContext.GetData(name, ...)` now correctly deserializes object/array nodes instead of requiring scalar-only `JsonValue`.
+- `MonthOnly.TryParse` now rejects out-of-range year/month values (for example `0000-01`, `2025-13`) without throwing.

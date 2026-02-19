@@ -14,6 +14,7 @@
 
 using Incursa;
 using System.ComponentModel;
+using System.Globalization;
 using System.Text.Json;
 using Xunit;
 
@@ -63,6 +64,18 @@ public class MoneyTests
         Assert.True(b < a);
         Assert.True(a >= b);
         Assert.True(b <= a);
+    }
+
+    [Fact]
+    public void ComparisonOperators_DistinguishStrictAndInclusive_OnEqualValues()
+    {
+        var left = new Money(10m);
+        var right = new Money(10m);
+
+        Assert.False(left > right);
+        Assert.True(left >= right);
+        Assert.False(left < right);
+        Assert.True(left <= right);
     }
 
     [Fact]
@@ -138,6 +151,20 @@ public class MoneyTests
 
         Assert.Equal(new Money(12.50m), parsed);
         Assert.Equal("12.50", formatted);
+
+        var cultureIgnored = converter.ConvertTo(null, new CultureInfo("fr-FR"), new Money(1234.5m), typeof(string));
+        Assert.Equal("1,234.50", Assert.IsType<string>(cultureIgnored));
+    }
+
+    [Fact]
+    public void TypeConverter_ConvertToDecimal_AndUnsupportedType_AreStrict()
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(Money));
+        var money = new Money(12.50m);
+
+        var asDecimal = converter.ConvertTo(money, typeof(decimal));
+        Assert.Equal(12.50m, Assert.IsType<decimal>(asDecimal));
+        Assert.Throws<NotSupportedException>(() => converter.ConvertTo(money, typeof(int)));
     }
 
     [Fact]
@@ -146,6 +173,25 @@ public class MoneyTests
         var money = new Money(123.45m);
         var words = money.ToWords();
         Assert.Equal("one hundred and twenty-three dollars and forty-five cents", words);
+    }
+
+    [Fact]
+    public void ToWords_WholeDollarValue_DoesNotEmitCents()
+    {
+        var words = new Money(123m).ToWords();
+
+        Assert.Contains("dollars", words, StringComparison.Ordinal);
+        Assert.DoesNotContain("cents", words, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void CompareTo_ObjectMoney_UsesUnderlyingValue()
+    {
+        var ten = new Money(10m);
+
+        Assert.Equal(0, ten.CompareTo((object)new Money(10m)));
+        Assert.True(ten.CompareTo((object)new Money(11m)) < 0);
+        Assert.True(ten.CompareTo((object)new Money(9m)) > 0);
     }
 
     [Fact]

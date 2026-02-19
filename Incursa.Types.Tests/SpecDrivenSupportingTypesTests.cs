@@ -29,12 +29,46 @@ public class SpecDrivenSupportingTypesTests
     }
 
     [Fact]
+    public void MonthOnly_AddMonths_Zero_AtBoundary_Succeeds()
+    {
+        Assert.Equal(MonthOnly.MaxValue, MonthOnly.MaxValue.AddMonths(0));
+    }
+
+    [Fact]
+    public void MonthOnly_TryParse_InvalidMonth_ReturnsFalseWithoutThrowing()
+    {
+        var ex = Record.Exception(() => MonthOnly.TryParse("2025-13", out var parsed));
+
+        Assert.Null(ex);
+        Assert.False(MonthOnly.TryParse("2025-13", out _));
+        Assert.False(MonthOnly.TryParse("0000-01", out _));
+    }
+
+    [Fact]
+    public void MonthOnly_TryParse_AcceptsYearBoundaries()
+    {
+        Assert.True(MonthOnly.TryParse("0001-01", out var min));
+        Assert.Equal(new MonthOnly(1, 1), min);
+
+        Assert.True(MonthOnly.TryParse("9999-12", out var max));
+        Assert.Equal(new MonthOnly(9999, 12), max);
+    }
+
+    [Fact]
     public void MonthOnly_TypeConverter_RoundTripsString()
     {
         var converter = TypeDescriptor.GetConverter(typeof(MonthOnly));
         var parsed = Assert.IsType<MonthOnly>(converter.ConvertFrom("2025-07"));
 
         Assert.Equal("2025-07", converter.ConvertTo(parsed, typeof(string)));
+    }
+
+    [Fact]
+    public void MonthOnly_TypeConverter_UnsupportedDestination_Throws()
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(MonthOnly));
+
+        Assert.Throws<NotSupportedException>(() => converter.ConvertTo(new MonthOnly(2025, 7), typeof(int)));
     }
 
     [Fact]
@@ -56,6 +90,12 @@ public class SpecDrivenSupportingTypesTests
 
         Assert.Equal("sam", context.GetData<string>("name"));
         Assert.Equal(42, context.GetData<int>("age"));
+    }
+
+    [Fact]
+    public void JsonContext_Constructor_Null_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => new JsonContext((System.Text.Json.Nodes.JsonObject)null!));
     }
 
     [Fact]
@@ -82,6 +122,15 @@ public class SpecDrivenSupportingTypesTests
 
         Assert.Equal("v", parsed.GetData<string>("k"));
         Assert.Equal("{\"k\":\"v\"}", converter.ConvertTo(parsed, typeof(string)));
+    }
+
+    [Fact]
+    public void JsonContext_TypeConverter_UnsupportedDestination_Throws()
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(JsonContext));
+        var parsed = Assert.IsType<JsonContext>(converter.ConvertFrom("{\"k\":\"v\"}"));
+
+        Assert.Throws<NotSupportedException>(() => converter.ConvertTo(parsed, typeof(int)));
     }
 
     [Fact]
@@ -192,6 +241,23 @@ public class SpecDrivenSupportingTypesTests
     {
         Assert.False(TimeZoneId.TryParse("Not/A_Real_Time_Zone", out var tz));
         Assert.Equal(default, tz);
+    }
+
+    [Fact]
+    public void TimeZoneId_TryParse_DoesNotThrow_OnInvalidInput()
+    {
+        var ex = Record.Exception(() => TimeZoneId.TryParse("Not/A_Real_Time_Zone", out _));
+
+        Assert.Null(ex);
+    }
+
+    [Fact]
+    public void TimeZoneId_TypeConverter_UnsupportedDestination_Throws()
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(TimeZoneId));
+        var tz = Assert.IsType<TimeZoneId>(converter.ConvertFrom("Pacific Standard Time"));
+
+        Assert.Throws<NotSupportedException>(() => converter.ConvertTo(tz, typeof(int)));
     }
 
     [Fact]

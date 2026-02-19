@@ -21,6 +21,7 @@ Represents a year-month value independent of day and time.
 
 ### Rejected
 - Null/whitespace or malformed parse text.
+- Out-of-range parse components (year `<1` or `>9999`, month `<1` or `>12`).
 - `FromMonthNumber` outside `0..119987`.
 - `AddMonths` overflow beyond representable range.
 
@@ -35,6 +36,7 @@ Represents a year-month value independent of day and time.
 
 ### Parse/TryParse
 - `TryParse` returns false/default for invalid input.
+- `TryParse` does not throw for invalid/out-of-range input.
 - `Parse` throws `FormatException` for invalid input.
 
 ### Formatting/ToString

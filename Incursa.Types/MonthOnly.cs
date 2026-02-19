@@ -165,10 +165,12 @@ public readonly partial struct MonthOnly
                 var year = TryParseGroup(match, "year");
                 var month = TryParseGroup(match, "month");
 
-                if (year.HasValue && month.HasValue)
+                if (year is >= 1 and <= 9999 && month is >= 1 and <= 12)
                 {
                     return new MonthOnly(year.Value, month.Value);
                 }
+
+                return null;
             }
             else if (DateTime.TryParse(value, DateTimeFormatInfo.InvariantInfo, out DateTime parsedDate))
             {
@@ -324,14 +326,9 @@ public readonly partial struct MonthOnly
             return base.ConvertFrom(context, culture, value);
         }
 
-        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
-        {
-            if (value is MonthOnly monthOnly && destinationType == typeof(string))
-            {
-                return monthOnly.ToString();
-            }
-
-            return base.ConvertTo(context, culture, value, destinationType);
-        }
+        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType) =>
+            value is MonthOnly monthOnly && destinationType == typeof(string)
+                ? monthOnly.ToString()
+                : base.ConvertTo(context, culture, value, destinationType);
     }
 }

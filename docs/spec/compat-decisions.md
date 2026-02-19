@@ -34,3 +34,18 @@ Case-by-case decisions when desired behavior differs from current behavior.
 - Required actions:
   - update runtime generator implementation
   - add generator contract test coverage
+
+### DEC-003: `MonthOnly.TryParse` must not throw on out-of-range components
+- Date: 2026-02-19
+- Type: `MonthOnly`
+- Prior behavior: `TryParse("2025-13")` and other out-of-range month/year inputs could throw due constructor validation.
+- New behavior: `TryParse` returns `null` / `false` for out-of-range values without throwing.
+- Decision: **Approved**
+- Rationale:
+  - `TryParse` APIs must be exception-free for invalid user input by contract
+  - avoids runtime exceptions in validation-heavy call paths
+- Migration impact:
+  - callers that previously observed exceptions from `TryParse` now receive non-throwing failure results
+- Required actions:
+  - guard year/month ranges before construction
+  - add boundary and invalid-component tests

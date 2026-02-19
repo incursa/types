@@ -248,9 +248,11 @@ jobs:
             -m "**/Money.cs" \
             -m "**/JsonContext.cs" \
             -m "**/MonthOnly.cs" \
-            -b 15 \
-            --threshold-low 15 \
-            --threshold-high 35 \
+            -m "**/Percentage.cs" \
+            -m "**/TimeZoneId.cs" \
+            -b 35 \
+            --threshold-low 35 \
+            --threshold-high 55 \
             --break-on-initial-test-failure \
             -r Progress \
             -r Html \
