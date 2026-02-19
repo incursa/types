@@ -69,7 +69,7 @@ public readonly record struct JsonContext
     public T GetData<T>(string name, JsonTypeInfo<T> jsonTypeInfo)
     {
         JsonNode? prop = this.RawData?[name];
-        return prop?.AsValue() is JsonValue value ? value.Deserialize<T>(jsonTypeInfo) : default;
+        return prop is null ? default : prop.Deserialize(jsonTypeInfo);
     }
 
     public T GetData<T>()
@@ -80,7 +80,7 @@ public readonly record struct JsonContext
     public T GetData<T>(string name)
     {
         JsonNode? prop = this.RawData?[name];
-        return prop?.AsValue() is JsonValue value ? value.Deserialize<T>() : default;
+        return prop is null ? default : prop.Deserialize<T>();
     }
 
     public void SetData<T>(string name, T data, JsonTypeInfo<T> jsonTypeInfo)
