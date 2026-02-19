@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Incursa;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xunit;

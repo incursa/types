@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using Incursa;
+using System.ComponentModel;
+using System.Text.Json;
 using Xunit;
 
 namespace Incursa.Types.Tests;
@@ -20,18 +22,21 @@ namespace Incursa.Types.Tests;
 public class MoneyTests
 {
     [Theory]
-    [InlineData(123.4567, "123.45")]
-    [InlineData(0.999, "0.99")]
-    [InlineData(-1.234, "-1.23")]
-    public void ToDecimal_TruncatesToTwoDecimalPlaces(decimal input, string expected)
+    [InlineData(123.4567, 123.46)]
+    [InlineData(0.999, 1.00)]
+    [InlineData(-1.234, -1.23)]
+    [InlineData(1.005, 1.00)]
+    [InlineData(1.015, 1.02)]
+    [InlineData(-2.225, -2.22)]
+    public void ToDecimal_NormalizesUsingBankersRounding(decimal input, decimal expected)
     {
         var money = new Money(input);
-        Assert.Equal(decimal.Parse(expected), money.ToDecimal());
+        Assert.Equal(expected, money.ToDecimal());
     }
 
     [Theory]
-    [InlineData(123.4567, "$123.45")]
-    [InlineData(-123.4567, "($123.45)")]
+    [InlineData(123.4567, "$123.46")]
+    [InlineData(-123.4567, "($123.46)")]
     public void ToAccounting_FormatsCorrectly(decimal input, string expected)
     {
         var money = new Money(input);
@@ -39,8 +44,8 @@ public class MoneyTests
     }
 
     [Theory]
-    [InlineData(1234.567, "$1,234.56")]
-    [InlineData(-1234.567, "-$1,234.56")]
+    [InlineData(1234.567, "$1,234.57")]
+    [InlineData(-1234.567, "-$1,234.57")]
     public void ToCurrency_FormatsCorrectly(decimal input, string expected)
     {
         var money = new Money(input);
@@ -52,8 +57,8 @@ public class MoneyTests
     {
         var a = new Money(10.555m);
         var b = new Money(2.333m);
-        Assert.Equal(new Money(12.88m), a + b);
-        Assert.Equal(new Money(8.22m), a - b);
+        Assert.Equal(new Money(12.89m), a + b);
+        Assert.Equal(new Money(8.23m), a - b);
         Assert.True(a > b);
         Assert.True(b < a);
         Assert.True(a >= b);
@@ -86,13 +91,53 @@ public class MoneyTests
     }
 
     [Fact]
-    public void Parse_And_TryParse_Work()
+    public void Parse_AcceptsInvariantNumericForms()
     {
-        var parsed = Money.Parse("123.45");
-        Assert.Equal(new Money(123.45m), parsed);
-        Assert.True(Money.TryParse("123.45", out var result));
-        Assert.Equal(new Money(123.45m), result);
-        Assert.Null(Money.TryParse("notanumber"));
+        Assert.Equal(new Money(1234.50m), Money.Parse("1,234.50"));
+        Assert.Equal(new Money(123.40m), Money.Parse(" 123.4 "));
+        Assert.Equal(new Money(-10.25m), Money.Parse("-10.25"));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("notanumber")]
+    [InlineData("$10.00")]
+    public void TryParse_InvalidValue_ReturnsFalse(string input)
+    {
+        Assert.False(Money.TryParse(input, out var result));
+        Assert.Equal(default, result);
+    }
+
+    [Fact]
+    public void Parse_InvalidValue_ThrowsFormatException()
+    {
+        Assert.Throws<FormatException>(() => Money.Parse("not-a-number"));
+    }
+
+    [Fact]
+    public void JsonConverter_RoundTripsInvariantValue()
+    {
+        var money = new Money(12.345m);
+        var json = JsonSerializer.Serialize(money);
+
+        Assert.Equal("\"12.34\"", json);
+        Assert.Equal(money, JsonSerializer.Deserialize<Money>(json));
+    }
+
+    [Fact]
+    public void TypeConverter_ConvertsToAndFromString()
+    {
+        var converter = TypeDescriptor.GetConverter(typeof(Money));
+        var parsedObject = converter.ConvertFrom("12.50");
+        var formattedObject = converter.ConvertTo(new Money(12.50m), typeof(string));
+        Assert.NotNull(parsedObject);
+        Assert.NotNull(formattedObject);
+        var parsed = Assert.IsType<Money>(parsedObject);
+        var formatted = Assert.IsType<string>(formattedObject);
+
+        Assert.Equal(new Money(12.50m), parsed);
+        Assert.Equal("12.50", formatted);
     }
 
     [Fact]

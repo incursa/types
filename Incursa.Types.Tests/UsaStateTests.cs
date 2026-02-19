@@ -1,4 +1,4 @@
-using Incursa;
+﻿using Incursa;
 using Xunit;
 
 namespace Incursa.Types.Tests;
