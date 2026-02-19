@@ -15,6 +15,9 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      COVERAGE_THRESHOLD_LINE: 52
+      COVERAGE_THRESHOLD_BRANCH: 29
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -32,14 +35,43 @@ jobs:
       - name: Restore
         run: dotnet restore Incursa.Core.slnx
 
+      - name: Verify type specs are present
+        shell: pwsh
+        run: ./scripts/verify-type-specs.ps1
+
       - name: Verify formatting and analyzers
         run: dotnet format --verify-no-changes Incursa.Core.slnx
 
       - name: Build (deterministic)
         run: dotnet build Incursa.Core.slnx --no-restore --configuration Release -warnaserror -p:ContinuousIntegrationBuild=true
 
-      - name: Test
-        run: dotnet test Incursa.Core.slnx --no-build --configuration Release
+      - name: Test with coverage gate
+        run: |
+          # Ratcheting baseline: increase these values toward long-term 85/85 as coverage expands.
+          dotnet test Incursa.Core.slnx \
+            --no-build \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura \
+            /p:Threshold=${COVERAGE_THRESHOLD_LINE}%2c${COVERAGE_THRESHOLD_BRANCH} \
+            /p:ThresholdType=line%2cbranch \
+            /p:ThresholdStat=total
+
+      - name: Create coverage summary
+        run: |
+          dotnet tool install --tool-path .tools dotnet-reportgenerator-globaltool --version 5.*
+          ./.tools/reportgenerator \
+            "-reports:**/coverage.cobertura.xml" \
+            "-targetdir:artifacts/coverage-report" \
+            "-reporttypes:HtmlInline;MarkdownSummaryGithub"
+          cat artifacts/coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: artifacts/coverage-report
 
       - name: Pack (repro 1)
         shell: bash
@@ -182,3 +214,50 @@ jobs:
             /tmp/repro1.names
             /tmp/repro2.names
             /tmp/nupkg-names.diff
+
+  mutation:
+    name: Mutation Testing (Stryker)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: verify
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Incursa.Core.slnx
+
+      - name: Install Stryker
+        run: dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
+
+      - name: Run mutation tests
+        run: |
+          ./.tools/dotnet-stryker \
+            -p Incursa.Types/Incursa.Types.csproj \
+            -tp Incursa.Types.Tests/Incursa.Types.Tests.csproj \
+            -l Basic \
+            -L \
+            -b 70 \
+            --threshold-low 70 \
+            --threshold-high 85 \
+            --break-on-initial-test-failure \
+            -r Progress \
+            -r Html \
+            -r Markdown \
+            -O artifacts/stryker \
+            --skip-version-check
+
+      - name: Upload mutation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: artifacts/stryker
