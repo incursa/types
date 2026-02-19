@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,26 +49,28 @@ public readonly partial record struct PhoneNumber
 
     public static PhoneNumber From(string value) => new(value);
 
-    public override string ToString() => Value;
+    public override string ToString() => Value ?? string.Empty;
 
     public bool Equals(PhoneNumber other)
     {
-        return string.Equals(Value, other.Value);
+        return string.Equals(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public override int GetHashCode()
     {
-        return Value?.GetHashCode() ?? 0;
+        return this.ToString().GetHashCode(StringComparison.Ordinal);
     }
 
     public int CompareTo(PhoneNumber other)
     {
-        return string.Compare(Value, other.Value, StringComparison.Ordinal);
+        return string.Compare(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)
     {
-        return obj is PhoneNumber id ? Value.CompareTo(id.Value) : Value.CompareTo(obj);
+        return obj is PhoneNumber id
+            ? string.Compare(this.ToString(), id.ToString(), StringComparison.Ordinal)
+            : string.Compare(this.ToString(), obj?.ToString(), StringComparison.Ordinal);
     }
 
     public static bool operator <(PhoneNumber left, PhoneNumber right) => left.CompareTo(right) < 0;
@@ -192,10 +194,10 @@ public readonly partial record struct PhoneNumber
         {
             if (value is string s)
             {
-                return PhoneNumber.TryParse(s) ?? default;
+                return PhoneNumber.TryParse(s) ?? throw new FormatException($"Invalid PhoneNumber value '{s}'.");
             }
 
-            return base.ConvertFrom(context, culture, value) ?? default;
+            return base.ConvertFrom(context, culture, value);
         }
 
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)

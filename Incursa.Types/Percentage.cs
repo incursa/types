@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -149,7 +149,7 @@ public readonly record struct Percentage
     /// string result3 = percentage3.ToStringRaw(); // result3 is "100%"
     /// </code>
     /// </example>
-    public string ToStringRaw() => $"{ScaledValue:0.00}%";
+    public string ToStringRaw() => $"{ScaledValue.ToString("0.00", CultureInfo.InvariantCulture)}%";
 
     /// <summary>
     /// Returns a formatted string representation of the percentage with the specified number of decimal places.
@@ -180,7 +180,7 @@ public readonly record struct Percentage
         var truncatedValue = Math.Truncate(scaledValue * multiplier) / multiplier;
 
         var format = decimals > 0 ? "0." + new string('0', decimals) : "0";
-        return $"{truncatedValue.ToString(format)}%";
+        return $"{truncatedValue.ToString(format, CultureInfo.InvariantCulture)}%";
     }
 
     public static Percentage? TryParse(string value)
@@ -202,12 +202,12 @@ public readonly record struct Percentage
 
     public static Percentage? TryParseScaled(string value)
     {
-        return decimal.TryParse(value, out var result) ? new Percentage(result / 100) : null;
+        return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result) ? new Percentage(result / 100) : null;
     }
 
     public static bool TryParseScaled(string value, out Percentage id)
     {
-        if (decimal.TryParse(value, out var result))
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result))
         {
             id = new Percentage(result / 100);
             return true;
@@ -217,15 +217,15 @@ public readonly record struct Percentage
         return false;
     }
 
-    public static Percentage Parse(string value) => new(decimal.Parse(value));
+    public static Percentage Parse(string value) => new(decimal.Parse(value, NumberStyles.Number, CultureInfo.InvariantCulture));
 
-    public static Percentage ParseScaled(string value) => new(decimal.Parse(value) / 100);
+    public static Percentage ParseScaled(string value) => new(decimal.Parse(value, NumberStyles.Number, CultureInfo.InvariantCulture) / 100);
 
-    public static Percentage Parse(ReadOnlySpan<char> s, IFormatProvider provider) => new(decimal.Parse(s, provider));
+    public static Percentage Parse(ReadOnlySpan<char> s, IFormatProvider provider) => new(decimal.Parse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture));
 
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider provider, [MaybeNullWhen(false)] out Percentage result)
     {
-        if (decimal.TryParse(s, provider, out var value))
+        if (decimal.TryParse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture, out var value))
         {
             result = new Percentage(value);
             return true;
@@ -235,11 +235,11 @@ public readonly record struct Percentage
         return false;
     }
 
-    public static Percentage Parse(string s, IFormatProvider provider) => new(decimal.Parse(s, provider));
+    public static Percentage Parse(string s, IFormatProvider provider) => new(decimal.Parse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture));
 
     public static bool TryParse([NotNullWhen(true)] string s, IFormatProvider provider, [MaybeNullWhen(false)] out Percentage result)
     {
-        if (decimal.TryParse(s, provider, out var value))
+        if (decimal.TryParse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture, out var value))
         {
             result = new Percentage(value);
             return true;
@@ -277,7 +277,7 @@ public readonly record struct Percentage
         }
 
         public override void Write(Utf8JsonWriter writer, Percentage value, JsonSerializerOptions options) =>
-            writer.WriteStringValue(value.Value.ToString());
+            writer.WriteStringValue(value.Value.ToString(CultureInfo.InvariantCulture));
     }
 
     // TypeConverter for Percentage to and from string and decimal

@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,48 +24,67 @@ using System.Text.Json.Serialization;
 
 [JsonConverter(typeof(ShortCodeJsonConverter))]
 [TypeConverter(typeof(ShortCodeTypeConverter))]
-public class ShortCode : IBvParsable<ShortCode>
+public readonly record struct ShortCode : IBvParsable<ShortCode>, IParsable<ShortCode>
 {
+    private const int DefaultLength = 8;
+    private const int MinLength = 4;
+    private const int MaxLength = 32;
     private const string Chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    private readonly string? rawCode;
+
+    public static readonly ShortCode Empty = default;
 
     public ShortCode()
     {
-        this.RawCode = GenerateInternal(8);
+        this.rawCode = GenerateInternal(DefaultLength);
     }
 
     public ShortCode(string code)
     {
-        this.RawCode = code.Replace("-", string.Empty, StringComparison.Ordinal).Trim().ToUpperInvariant();
+        this.rawCode = NormalizeAndValidate(code);
+    }
+
+    private ShortCode(string code, bool skipValidation)
+    {
+        this.rawCode = skipValidation ? code : NormalizeAndValidate(code);
     }
 
     public string FormattedCode
     {
         get
         {
+            if (this.IsEmpty)
+            {
+                return string.Empty;
+            }
+
             var middle = this.RawCode.Length / 2;
             return $"{this.RawCode[..middle]}-{this.RawCode[middle..]}";
         }
     }
 
-    public string RawCode { get; }
+    public string RawCode => this.rawCode ?? string.Empty;
+
+    public bool IsEmpty => string.IsNullOrEmpty(this.rawCode);
 
     public static ShortCode Generate(int length)
     {
         var code = GenerateInternal(length);
-        return new ShortCode(code);
+        return new ShortCode(code, true);
     }
 
-    public override string ToString()
-    {
-        return this.RawCode;
-    }
+    public override string ToString() => this.RawCode;
 
     private static string GenerateInternal(int length)
     {
+        if (length is < MinLength or > MaxLength)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length), $"ShortCode length must be between {MinLength} and {MaxLength}.");
+        }
+
         var charsLength = (byte)Chars.Length;
 
         var sb = new StringBuilder();
-        _ = new byte[1];
         for (var i = 0; i < length; i++)
         {
             byte[] randomNumber;
@@ -97,11 +116,38 @@ public class ShortCode : IBvParsable<ShortCode>
         return roll < maxValue * fullSetsOfValues;
     }
 
+    private static string NormalizeAndValidate(string code)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(code);
+
+        string normalized = code.Replace("-", string.Empty, StringComparison.Ordinal).Trim().ToUpperInvariant();
+        if (normalized.Length is < MinLength or > MaxLength)
+        {
+            throw new ArgumentOutOfRangeException(nameof(code), $"ShortCode length must be between {MinLength} and {MaxLength}.");
+        }
+
+        foreach (char c in normalized)
+        {
+            if (!Chars.Contains(c))
+            {
+                throw new ArgumentException($"ShortCode contains an invalid character '{c}'.", nameof(code));
+            }
+        }
+
+        return normalized;
+    }
+
     public class ShortCodeJsonConverter : JsonConverter<ShortCode>
     {
         public override ShortCode Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new ShortCode(reader.GetString());
+            if (reader.TokenType is not JsonTokenType.String and not JsonTokenType.PropertyName)
+            {
+                throw new JsonException("ShortCode must be a JSON string.");
+            }
+
+            string? value = reader.GetString();
+            return TryParse(value, out ShortCode parsed) ? parsed : throw new JsonException($"Invalid ShortCode '{value}'.");
         }
 
         public override void Write(Utf8JsonWriter writer, ShortCode value, JsonSerializerOptions options) =>
@@ -120,20 +166,20 @@ public class ShortCode : IBvParsable<ShortCode>
                 this.Read(ref reader, typeToConvert, options);
     }
 
-    // TypeConverter for ShortCode to and from string and Guid
+    // TypeConverter for ShortCode to and from string
     public class ShortCodeTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-            sourceType == typeof(string) || sourceType == typeof(Guid) || base.CanConvertFrom(context, sourceType);
+            sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
         public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) =>
-            destinationType == typeof(string) || destinationType == typeof(Guid) || base.CanConvertTo(context, destinationType);
+            destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
             if (value is string s)
             {
-                return new ShortCode(s);
+                return Parse(s);
             }
 
             return base.ConvertFrom(context, culture, value);
@@ -155,9 +201,30 @@ public class ShortCode : IBvParsable<ShortCode>
         return new ShortCode(value);
     }
 
+    public static ShortCode Parse(string s, IFormatProvider? provider) => Parse(s);
+
     public static bool TryParse([NotNullWhen(true)] string? value, [MaybeNullWhen(false)] out ShortCode result)
     {
-        result = new ShortCode(value);
-        return true;
+        return TryParse(value, null, out result);
+    }
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out ShortCode result)
+    {
+        if (string.IsNullOrWhiteSpace(s))
+        {
+            result = default;
+            return false;
+        }
+
+        try
+        {
+            result = new ShortCode(s);
+            return true;
+        }
+        catch
+        {
+            result = default;
+            return false;
+        }
     }
 }

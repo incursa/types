@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@ using System.Text.Json.Serialization.Metadata;
 [TypeConverter(typeof(JsonContextTypeConverter))]
 public readonly record struct JsonContext
 {
+    private readonly JsonObject? rawData;
+
     public JsonContext(JsonObject value)
     {
-        this.RawData = value;
+        this.rawData = value ?? throw new ArgumentNullException(nameof(value));
     }
 
     public JsonContext(IReadOnlyDictionary<string, JsonValue> values)
@@ -39,7 +41,7 @@ public readonly record struct JsonContext
             json[value.Key] = value.Value;
         }
 
-        this.RawData = json;
+        this.rawData = json;
     }
 
     public JsonContext(IReadOnlyDictionary<string, string> values)
@@ -50,10 +52,10 @@ public readonly record struct JsonContext
             json[value.Key] = JsonValue.Create(value.Value);
         }
 
-        this.RawData = json;
+        this.rawData = json;
     }
 
-    public JsonObject RawData { get; }
+    public JsonObject RawData => this.rawData ?? new JsonObject();
 
     public string Value => this.ToString();
 
@@ -84,23 +86,27 @@ public readonly record struct JsonContext
     public void SetData<T>(string name, T data, JsonTypeInfo<T> jsonTypeInfo)
         where T : class
     {
-        this.RawData[name] = JsonNode.Parse(JsonSerializer.Serialize(data, jsonTypeInfo));
+        JsonObject target = this.EnsureWritableRawData();
+        target[name] = JsonNode.Parse(JsonSerializer.Serialize(data, jsonTypeInfo));
     }
 
     public void SetData(string name, object data, JsonTypeInfo jsonTypeInfo)
     {
-        this.RawData[name] = JsonNode.Parse(JsonSerializer.Serialize(data, jsonTypeInfo));
+        JsonObject target = this.EnsureWritableRawData();
+        target[name] = JsonNode.Parse(JsonSerializer.Serialize(data, jsonTypeInfo));
     }
 
     public void SetData<T>(string name, T data)
         where T : class
     {
-        this.RawData[name] = JsonNode.Parse(JsonSerializer.Serialize<T>(data));
+        JsonObject target = this.EnsureWritableRawData();
+        target[name] = JsonNode.Parse(JsonSerializer.Serialize<T>(data));
     }
 
     public void SetData(string name, object data)
     {
-        this.RawData[name] = JsonNode.Parse(JsonSerializer.Serialize(data));
+        JsonObject target = this.EnsureWritableRawData();
+        target[name] = JsonNode.Parse(JsonSerializer.Serialize(data));
     }
 
     public static JsonContext Empty() => new(new JsonObject());
@@ -177,7 +183,10 @@ public readonly record struct JsonContext
         return false;
     }
 
-    public static JsonContext Parse(string value) => TryParse(value).Value;
+    public static JsonContext Parse(string value) => TryParse(value) ?? throw new FormatException($"Invalid JSON object value '{value}'.");
+
+    private JsonObject EnsureWritableRawData() =>
+        this.rawData ?? throw new InvalidOperationException("Cannot mutate a default JsonContext. Use JsonContext.Empty().");
 
     public class JsonContextJsonConverter : JsonConverter<JsonContext>
     {
@@ -211,10 +220,10 @@ public readonly record struct JsonContext
         {
             if (value is string s)
             {
-                return JsonContext.TryParse(s) ?? default;
+                return JsonContext.TryParse(s) ?? throw new FormatException($"Invalid JsonContext value '{s}'.");
             }
 
-            return base.ConvertFrom(context, culture, value) ?? default;
+            return base.ConvertFrom(context, culture, value);
         }
 
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)

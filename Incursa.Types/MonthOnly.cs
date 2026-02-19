@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Incursa.Types;
+namespace Incursa;
 /// <summary>
 /// Represents dates with values ranging from January, 0001 Anno Domini (Common Era) through December, 9999 A.D. (C.E.) in the Gregorian calendar.
 /// </summary>
@@ -305,14 +305,14 @@ public readonly partial struct MonthOnly
             writer.WriteStringValue(value.ToString());
     }
 
-    // TypeConverter for MonthOnly to and from string and decimal
+    // TypeConverter for MonthOnly to and from string
     public class MonthOnlyTypeConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
-            sourceType == typeof(string) || sourceType == typeof(decimal) || base.CanConvertFrom(context, sourceType);
+            sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
         public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) =>
-            destinationType == typeof(string) || destinationType == typeof(decimal) || base.CanConvertTo(context, destinationType);
+            destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
 
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {

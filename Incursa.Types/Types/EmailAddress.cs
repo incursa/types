@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,26 +46,28 @@ public readonly partial record struct EmailAddress
 
     public static EmailAddress From(string value) => new(value);
 
-    public override string ToString() => Value;
+    public override string ToString() => Value ?? string.Empty;
 
     public bool Equals(EmailAddress other)
     {
-        return string.Equals(Value, other.Value);
+        return string.Equals(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public override int GetHashCode()
     {
-        return Value?.GetHashCode() ?? 0;
+        return this.ToString().GetHashCode(StringComparison.Ordinal);
     }
 
     public int CompareTo(EmailAddress other)
     {
-        return string.Compare(Value, other.Value, StringComparison.Ordinal);
+        return string.Compare(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)
     {
-        return obj is EmailAddress id ? Value.CompareTo(id.Value) : Value.CompareTo(obj);
+        return obj is EmailAddress id
+            ? string.Compare(this.ToString(), id.ToString(), StringComparison.Ordinal)
+            : string.Compare(this.ToString(), obj?.ToString(), StringComparison.Ordinal);
     }
 
     public static bool operator <(EmailAddress left, EmailAddress right) => left.CompareTo(right) < 0;
@@ -189,10 +191,10 @@ public readonly partial record struct EmailAddress
         {
             if (value is string s)
             {
-                return EmailAddress.TryParse(s) ?? default;
+                return EmailAddress.TryParse(s) ?? throw new FormatException($"Invalid EmailAddress value '{s}'.");
             }
 
-            return base.ConvertFrom(context, culture, value) ?? default;
+            return base.ConvertFrom(context, culture, value);
         }
 
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)

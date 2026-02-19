@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public readonly record struct Period
             throw new ArgumentException("The end of the period cannot be before the start.", nameof(end));
         }
 
-        this.EndInclusive = this.EndExclusive - TimeSpan.FromTicks(1);
+        this.EndInclusive = this.EndExclusive == this.StartInclusive ? this.EndExclusive : this.EndExclusive - TimeSpan.FromTicks(1);
 
         TimeSpan difference = end - start;
         this.Duration = new Duration(null, null, null, difference.Days, difference.Hours, difference.Minutes, difference.Seconds);
@@ -53,7 +53,7 @@ public readonly record struct Period
             throw new ArgumentException("The duration cannot result in the end of the period before the start.", nameof(duration));
         }
 
-        this.EndInclusive = this.EndExclusive - TimeSpan.FromTicks(1);
+        this.EndInclusive = this.EndExclusive == this.StartInclusive ? this.EndExclusive : this.EndExclusive - TimeSpan.FromTicks(1);
     }
 
     public Duration Duration { get; }
@@ -144,9 +144,9 @@ public readonly record struct Period
         return new DateOnly(date.Year, date.Month, date.Day);
     }
 
-    public bool Contains(DateTimeOffset date) => date >= this.StartInclusive && date <= this.EndExclusive;
+    public bool Contains(DateTimeOffset date) => date >= this.StartInclusive && date < this.EndExclusive;
 
-    public bool Overlaps(in Period other) => this.Contains(other.StartInclusive) || this.Contains(other.EndExclusive) || other.Contains(this.StartInclusive) || other.Contains(this.EndExclusive);
+    public bool Overlaps(in Period other) => this.StartInclusive < other.EndExclusive && other.StartInclusive < this.EndExclusive;
 
     public override string ToString() => $"{this.StartInclusive:O}/{this.Duration}";
 

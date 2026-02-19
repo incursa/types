@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -304,26 +304,28 @@ public readonly partial record struct UsaState
 
     static partial void ProcessValue(string value);
 
-    public override string ToString() => Value;
+    public override string ToString() => Value ?? string.Empty;
 
     public bool Equals(UsaState other)
     {
-        return string.Equals(Value, other.Value);
+        return string.Equals(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public override int GetHashCode()
     {
-        return Value?.GetHashCode() ?? 0;
+        return this.ToString().GetHashCode(StringComparison.Ordinal);
     }
 
     public int CompareTo(UsaState other)
     {
-        return string.Compare(Value, other.Value, StringComparison.Ordinal);
+        return string.Compare(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)
     {
-        return obj is UsaState id ? Value.CompareTo(id.Value) : Value.CompareTo(obj);
+        return obj is UsaState id
+            ? string.Compare(this.ToString(), id.ToString(), StringComparison.Ordinal)
+            : string.Compare(this.ToString(), obj?.ToString(), StringComparison.Ordinal);
     }
 
     public static bool operator <(UsaState left, UsaState right) => left.CompareTo(right) < 0;
@@ -1344,10 +1346,10 @@ public readonly partial record struct UsaState
         {
             if (value is string s)
             {
-                return UsaState.TryParse(s) ?? default;
+                return UsaState.TryParse(s) ?? throw new FormatException($"Invalid UsaState value '{s}'.");
             }
 
-            return base.ConvertFrom(context, culture, value) ?? default;
+            return base.ConvertFrom(context, culture, value);
         }
 
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)

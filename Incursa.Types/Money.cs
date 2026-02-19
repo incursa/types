@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ using Humanizer;
 namespace Incursa;
 
 /// <summary>
-/// Represents a monetary value, always truncated to two decimal places.
+/// Represents a monetary value, normalized to two decimal places using banker's rounding (midpoint-to-even).
 /// </summary>
 [DebuggerDisplay("{ToAccounting(false, true)}")]
 [JsonConverter(typeof(MoneyJsonConverter))]
@@ -131,20 +131,20 @@ public readonly record struct Money
     };
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Money"/> struct, truncating the value to two decimal places.
+    /// Initializes a new instance of the <see cref="Money"/> struct, normalizing to two decimal places.
     /// </summary>
     /// <param name="value">The monetary value as a decimal.</param>
     public Money(decimal value)
     {
-        rawValue = TruncateToTwoDecimalPlaces(value);
+        rawValue = NormalizeToTwoDecimalPlaces(value);
     }
 
     public static Money From(decimal value) => new Money(value);
     public static Money? From(decimal? value) => value.HasValue ? new Money(value.Value) : null;
 
-    private static decimal TruncateToTwoDecimalPlaces(decimal value)
+    private static decimal NormalizeToTwoDecimalPlaces(decimal value)
     {
-        return Math.Truncate(value * 100m) / 100m;
+        return Math.Round(value, 2, MidpointRounding.ToEven);
     }
 
     public static Money operator +(Money a, Money b) => new(a.rawValue + b.rawValue);
@@ -250,19 +250,19 @@ public readonly record struct Money
 
     public static Money Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
     {
-        return new Money(decimal.Parse(s, provider));
+        return new Money(decimal.Parse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture));
     }
 
     public static Money Parse(string s, IFormatProvider? provider)
     {
-        return new Money(decimal.Parse(s, provider));
+        return new Money(decimal.Parse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture));
     }
 
-    public static Money Parse(string value) => new(decimal.Parse(value));
+    public static Money Parse(string value) => new(decimal.Parse(value, NumberStyles.Number, CultureInfo.InvariantCulture));
 
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Money result)
     {
-        if (decimal.TryParse(s, provider, out var id))
+        if (decimal.TryParse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture, out var id))
         {
             result = new Money(id);
             return true;
@@ -274,7 +274,7 @@ public readonly record struct Money
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Money result)
     {
-        if (decimal.TryParse(s, provider, out var id))
+        if (decimal.TryParse(s, NumberStyles.Number, provider ?? CultureInfo.InvariantCulture, out var id))
         {
             result = new Money(id);
             return true;
@@ -286,7 +286,7 @@ public readonly record struct Money
 
     public static Money? TryParse(string value)
     {
-        if (decimal.TryParse(value, out var result))
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result))
         {
             return new Money(result);
         }
@@ -296,7 +296,7 @@ public readonly record struct Money
 
     public static bool TryParse(string value, out Money id)
     {
-        if (decimal.TryParse(value, out var result))
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result))
         {
             id = new Money(result);
             return true;
@@ -306,7 +306,7 @@ public readonly record struct Money
         return false;
     }
 
-    public decimal ToDecimal() => TruncateToTwoDecimalPlaces(rawValue);
+    public decimal ToDecimal() => NormalizeToTwoDecimalPlaces(rawValue);
 
     public Money Normalize() => new(ToDecimal());
 
@@ -416,7 +416,7 @@ public readonly record struct Money
     /// <summary>
     /// Returns the value as a string.
     /// </summary>
-    public override string ToString() => ToDecimal().ToString();
+    public override string ToString() => ToDecimal().ToString(CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Returns the value in words (e.g., "one hundred dollars and fifty cents").
@@ -456,7 +456,7 @@ public readonly record struct Money
         }
 
         public override void Write(Utf8JsonWriter writer, Money value, JsonSerializerOptions options) =>
-            writer.WriteStringValue(value.rawValue.ToString());
+            writer.WriteStringValue(value.rawValue.ToString(CultureInfo.InvariantCulture));
     }
 
     // TypeConverter for Money to and from string and decimal

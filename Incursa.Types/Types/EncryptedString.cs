@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Cryptography;
 using CommunityToolkit.Diagnostics;
 
 #nullable enable
@@ -37,30 +38,34 @@ public readonly partial record struct EncryptedString
 
     public string Value { get; init; }
 
+    public bool IsEmpty => string.IsNullOrEmpty(this.Value);
+
     static partial void ProcessValue(string value);
 
     public static EncryptedString From(string value) => new(value);
 
-    public override string ToString() => Value;
+    public override string ToString() => this.Value ?? string.Empty;
 
     public bool Equals(EncryptedString other)
     {
-        return string.Equals(Value, other.Value, StringComparison.Ordinal);
+        return string.Equals(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public override int GetHashCode()
     {
-        return Value?.GetHashCode(StringComparison.Ordinal) ?? 0;
+        return this.ToString().GetHashCode(StringComparison.Ordinal);
     }
 
     public int CompareTo(EncryptedString other)
     {
-        return string.Compare(Value, other.Value, StringComparison.Ordinal);
+        return string.Compare(this.ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public int CompareTo(object? obj)
     {
-        return obj is EncryptedString id ? Value.CompareTo(id.Value) : Value.CompareTo(obj);
+        return obj is EncryptedString id
+            ? string.Compare(this.ToString(), id.ToString(), StringComparison.Ordinal)
+            : string.Compare(this.ToString(), obj?.ToString(), StringComparison.Ordinal);
     }
 
     public static bool operator <(EncryptedString left, EncryptedString right) => left.CompareTo(right) < 0;
@@ -142,7 +147,8 @@ public readonly partial record struct EncryptedString
 
     public static EncryptedString GenerateRandom()
     {
-        return new EncryptedString(Guid.NewGuid().ToString("N"));
+        var random = RandomNumberGenerator.GetBytes(32);
+        return new EncryptedString(Convert.ToBase64String(random));
     }
 
     public class EncryptedStringJsonConverter : JsonConverter<EncryptedString>
@@ -184,10 +190,10 @@ public readonly partial record struct EncryptedString
         {
             if (value is string s)
             {
-                return EncryptedString.TryParse(s) ?? default;
+                return EncryptedString.TryParse(s) ?? throw new FormatException($"Invalid EncryptedString value '{s}'.");
             }
 
-            return base.ConvertFrom(context, culture, value) ?? default;
+            return base.ConvertFrom(context, culture, value);
         }
 
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)

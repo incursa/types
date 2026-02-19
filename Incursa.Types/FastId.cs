@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,31 +35,33 @@ public readonly partial record struct FastId
     private const int TimestampBits = 34;
     private const int RandomBits = 30; // 64 - TimestampBits
     private static readonly ulong MaxRandom = (1UL << RandomBits) - 1;
-    private readonly Lazy<string> encoded;
+    private readonly string? encodedValue;
 
     public static readonly FastId Empty = new FastId(0, "0");
 
     private FastId(long value, string encodedValue)
     {
         this.Value = value;
-        this.encoded = new Lazy<string>(() => encodedValue.ToUpperInvariant());
+        this.encodedValue = encodedValue.ToUpperInvariant();
     }
 
     public FastId(long value)
     {
         this.Value = value;
-        this.encoded = new Lazy<string>(() => CrockfordBase32.Encode(LongBitShuffler.ShuffleBits(value)));
+        this.encodedValue = null;
     }
 
     public long Value { get; init; }
 
-    public string Encoded => this.encoded.Value;
+    public bool IsEmpty => this.Value == 0;
+
+    public string Encoded => this.encodedValue ?? CrockfordBase32.Encode(LongBitShuffler.ShuffleBits(this.Value));
 
     public override string ToString() => this.Encoded;
 
     public bool Equals(FastId other)
     {
-        return string.Equals(this.Value, other.Value);
+        return this.Value == other.Value;
     }
 
     public override int GetHashCode()
@@ -102,8 +104,8 @@ public readonly partial record struct FastId
 
         ulong maxTimestampSeconds = (ulong)(maxTimestamp - CustomEpoch).TotalSeconds;
 
-        // Ensure the provided max timestamp doesn't exceed what 42 bits can hold.
-        // This is a safety check; 2^42 seconds is over 139,000 years.
+        // Ensure the provided max timestamp doesn't exceed what 34 bits can hold.
+        // This is a safety check; 2^34 seconds is over 544 years.
         ulong maxAllowedTimestampValue = (1UL << TimestampBits) - 1;
         if (maxTimestampSeconds > maxAllowedTimestampValue)
         {
@@ -117,8 +119,8 @@ public readonly partial record struct FastId
         ulong hashedGuidValue = (ulong)(part1 ^ part2);
 
         // 3. Extract the timestamp and random parts from the hash.
-        ulong hashedTimestampPart = hashedGuidValue >> RandomBits; // The top 42 bits of the hash
-        ulong hashedRandomPart = hashedGuidValue & MaxRandom;      // The bottom 22 bits of the hash
+        ulong hashedTimestampPart = hashedGuidValue >> RandomBits; // The top 34 bits of the hash
+        ulong hashedRandomPart = hashedGuidValue & MaxRandom;      // The bottom 30 bits of the hash
 
         // 4. Constrain the timestamp part to be within our allowed range [0, maxTimestampSeconds].
         //    We add 1 to maxTimestampSeconds because the modulo range is [0, N-1].
@@ -171,8 +173,8 @@ public readonly partial record struct FastId
         ulong hashedValue = BitConverter.ToUInt64(hashBytes, 0);
 
         // 4. Extract the timestamp and random parts from the hash.
-        ulong hashedTimestampPart = hashedValue >> RandomBits; // The top 42 bits
-        ulong hashedRandomPart = hashedValue & MaxRandom;      // The bottom 22 bits
+        ulong hashedTimestampPart = hashedValue >> RandomBits; // The top 34 bits
+        ulong hashedRandomPart = hashedValue & MaxRandom;      // The bottom 30 bits
 
         // 5. Constrain the timestamp part to be within our allowed range [0, maxTimestampSeconds].
         ulong constrainedTimestampSeconds = hashedTimestampPart % (maxTimestampSeconds + 1);
@@ -264,11 +266,6 @@ public readonly partial record struct FastId
         }
         catch (OverflowException) // Decoded number too large for ulong (i.e., > 64 bits)
         {
-            return false;
-        }
-        catch (Exception) // Catch any other unexpected errors during decode, though specific ones are better
-        {
-            // Log this unexpected exception
             return false;
         }
     }

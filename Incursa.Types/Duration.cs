@@ -1,7 +1,18 @@
-// CONFIDENTIAL - Copyright (c) PayeWaive LLC. All rights reserved.
-// See NOTICE.md for full restrictions and usage terms.
-
-
+﻿// Copyright (c) Samuel McAravey
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Diagnostics;
 
@@ -13,15 +24,6 @@ namespace Incursa;
 public readonly partial record struct Duration
     : IStringBackedType<Duration>
 {
-    private readonly string yearsString;
-    private readonly string monthsString;
-    private readonly string weeksString;
-    private readonly string daysString;
-    private readonly string hoursString;
-    private readonly string minutesString;
-    private readonly string secondsString;
-    private readonly string valueString;
-
     private const string PeriodTag = "P";
     private const string TimeTag = "T";
     private const string YearsTag = "Y";
@@ -56,17 +58,6 @@ public readonly partial record struct Duration
         Minutes = minutes;
         Seconds = seconds;
 
-        yearsString = Years > 0 ? $"{Years.Value}{YearsTag}" : string.Empty;
-        monthsString = Months > 0 ? $"{Months.Value}{MonthsTag}" : string.Empty;
-        weeksString = Weeks > 0 ? $"{Weeks.Value}{WeeksTag}" : string.Empty;
-        daysString = Days > 0 ? $"{Days.Value}{DaysTag}" : string.Empty;
-        hoursString = Hours > 0 ? $"{Hours.Value}{HoursTag}" : string.Empty;
-        minutesString = Minutes > 0 ? $"{Minutes.Value}{MinutesTag}" : string.Empty;
-        secondsString = Seconds > 0 ? $"{Seconds.Value}{SecondsTag}" : string.Empty;
-
-        var dateString = yearsString + monthsString + weeksString + daysString;
-        var timeString = hoursString + minutesString + secondsString;
-        valueString = PeriodTag + dateString + (string.IsNullOrWhiteSpace(timeString) ? string.Empty : TimeTag + timeString);
     }
 
     public double? Years { get; }
@@ -87,7 +78,26 @@ public readonly partial record struct Duration
 
     public static Duration From(string value) => Duration.Parse(value);
 
-    public override string ToString() => valueString;
+    public override string ToString()
+    {
+        var dateBuilder = new StringBuilder();
+        AppendComponent(dateBuilder, Years, YearsTag);
+        AppendComponent(dateBuilder, Months, MonthsTag);
+        AppendComponent(dateBuilder, Weeks, WeeksTag);
+        AppendComponent(dateBuilder, Days, DaysTag);
+
+        var timeBuilder = new StringBuilder();
+        AppendComponent(timeBuilder, Hours, HoursTag);
+        AppendComponent(timeBuilder, Minutes, MinutesTag);
+        AppendComponent(timeBuilder, Seconds, SecondsTag);
+
+        if (dateBuilder.Length == 0 && timeBuilder.Length == 0)
+        {
+            return "P0D";
+        }
+
+        return PeriodTag + dateBuilder + (timeBuilder.Length > 0 ? TimeTag + timeBuilder.ToString() : string.Empty);
+    }
 
     public DateTimeOffset Calculate(DateTimeOffset start)
     {
@@ -239,7 +249,8 @@ public readonly partial record struct Duration
 
     private static double? TryParseGroup(Match match, string groupName)
     {
-        if (match?.Groups[groupName]?.Success is true && double.TryParse(match.Groups[groupName].Value, out var val))
+        if (match?.Groups[groupName]?.Success is true &&
+            double.TryParse(match.Groups[groupName].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var val))
         {
             return val;
         }
@@ -261,19 +272,35 @@ public readonly partial record struct Duration
 #pragma warning restore S1244 // Floating point numbers should not be tested for equality
     }
 
+    private static void AppendComponent(StringBuilder builder, double? value, string suffix)
+    {
+        if (!value.HasValue || !AboutNotEqual(value.Value, 0))
+        {
+            return;
+        }
+
+        builder.Append(value.Value.ToString("0.###############################", CultureInfo.InvariantCulture));
+        builder.Append(suffix);
+    }
+
     public int CompareTo(object? obj)
     {
+        if (obj is null)
+        {
+            return 1;
+        }
+
         if (obj is Duration duration)
         {
             return CompareTo(duration);
         }
 
-        return 0;
+        throw new ArgumentException("Object must be a Duration.", nameof(obj));
     }
 
     public int CompareTo(Duration other)
     {
-        return string.Compare(ToString(), other.ToString(), StringComparison.OrdinalIgnoreCase);
+        return string.Compare(ToString(), other.ToString(), StringComparison.Ordinal);
     }
 
     public class DurationJsonConverter : JsonConverter<Duration>

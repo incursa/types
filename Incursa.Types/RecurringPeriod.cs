@@ -1,4 +1,4 @@
-// Copyright (c) Samuel McAravey
+﻿// Copyright (c) Samuel McAravey
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,8 +29,16 @@ public readonly record struct RecurringPeriod
 
     public Period GetPeriod(DateTime startUtc)
     {
-        DateTimeOffset startDate = this.Expression.GetOccurrences(startUtc.AddDays(-60), startUtc, TimeZoneInfo.Utc).Last();
-        DateTimeOffset? endDate = this.Expression.GetNextOccurrence(DateTimeOffset.UtcNow, TimeZoneInfo.Utc);
+        var utcStart = startUtc.Kind == DateTimeKind.Utc ? startUtc : startUtc.ToUniversalTime();
+
+        var previous = this.Expression.GetOccurrences(utcStart.AddDays(-60), utcStart, TimeZoneInfo.Utc).LastOrDefault();
+        if (previous == default)
+        {
+            return default;
+        }
+
+        DateTimeOffset startDate = new DateTimeOffset(DateTime.SpecifyKind(previous, DateTimeKind.Utc));
+        DateTimeOffset? endDate = this.Expression.GetNextOccurrence(utcStart, TimeZoneInfo.Utc);
         if (!endDate.HasValue)
         {
             return default;
