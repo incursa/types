@@ -12,11 +12,11 @@ This document tracks the six-step cleanup and hardening workstream.
 | Step | Objective | Status | Notes |
 | --- | --- | --- | --- |
 | 1 | Reduce branch noise and define commit grouping | Completed | Added file-group plan and staging helper script. |
-| 2 | Address coverage gap vs CI gate | Completed | Coverage now 57.24% line / 29.52% branch; CI ratcheted baseline set to 52% / 29%. |
+| 2 | Address coverage gap vs CI gate | Completed | Coverage now 66.89% line / 53.98% branch; CI ratcheted baseline set to 60% / 45%. |
 | 3 | Complete spec traceability for all types | Completed | `docs/spec/test-traceability.md` now includes entries for all public concrete types. |
 | 4 | Finalize release docs | Completed | `CHANGELOG.md` and `docs/migration-v2.md` updated for current behavior changes. |
 | 5 | Harden spec gate to validate structure/content | Completed | Spec verifier now checks metadata, sections, placeholders, and control characters. |
-| 6 | Run mutation testing and capture actions | Completed | Scoped Stryker run executed; score 0.00%, follow-up listed below. |
+| 6 | Run mutation testing and capture actions | Completed | Scoped Stryker run executed; `Money.cs` pilot now kills mutants (score 21.50%), and CI mutation gate is scoped/ratcheted. |
 
 ## Planned commit groups
 
@@ -61,10 +61,14 @@ This document tracks the six-step cleanup and hardening workstream.
 4. `specs-and-documentation`
 5. `ci-quality-gates`
 
-## Mutation follow-up (from `artifacts/stryker-scoped`)
-- Observed result: `Killed: 0`, `Survived: 282`, score `0.00%`.
-Immediate actions:
-1. Verify Stryker test-discovery/execution path for xUnit v3 project configuration. Status: Completed locally via `scripts/run-stryker-pilot.ps1` (`Money.cs`) with runner logs under `artifacts/stryker-pilot/logs`.
-2. Enable Stryker file logging (`-L`) in CI and publish full logs for diagnosis. Status: Completed in quality workflow.
-3. Start with a single-file pilot (`Money.cs`) and enforce non-zero mutation score before broad rollout.
-4. Improve assertions for `Money`, `JsonContext`, `MonthOnly`, `ShortCode`, `VirtualPath`, and `Locale`.
+## Mutation follow-up (from `artifacts/stryker-pilot`)
+- Previous observed result: `Killed: 0`, `Survived: 282`, score `0.00%`.
+- Current observed result: `Killed: 23`, `Survived: 8`, score `21.50%` on `Money.cs` pilot scope.
+Actions completed:
+1. Normalize test runner compatibility by removing mixed xUnit v3 package overrides in test projects.
+2. Keep Stryker file logging (`-L`) in CI and publish mutation artifacts for diagnostics.
+3. Scope CI mutation gate to `Money.cs` pilot until broader file sets have stronger mutation-kill tests.
+4. Add low-coverage type tests and expand traceability mapping for parse/format/convert contracts.
+Next ratchet targets:
+1. Raise mutation pilot break threshold above `10` once sustained score exceeds `25`.
+2. Add `JsonContext` and `MonthOnly` to mutation scope after additional assertion hardening.

@@ -3,8 +3,8 @@
 This repo uses a ratcheting strategy to move coverage gates to the long-term target without breaking delivery on an existing low baseline.
 
 ## Current baseline (2026-02-19)
-- Line: `52%`
-- Branch: `29%`
+- Line: `60%`
+- Branch: `45%`
 
 Configured in `.github/workflows/quality.yml` as:
 - `COVERAGE_THRESHOLD_LINE`
@@ -24,10 +24,10 @@ Configured in `.github/workflows/quality.yml` as:
    - `CHANGELOG.md` (Unreleased)
 
 ## Immediate focus areas
-- `MonthOnly`
+- `BvFile`
 - `JsonContext`
-- `Locale`
-- `ShortCode`
-- `TimeZoneId`
-- `CurrencyCode`
-- `EmailAddress` / `PhoneNumber` converter branches
+- `EmailAddress` / `EncryptedString`
+- `MoneyExtensions`
+- `Percentage`
+- `MonthOnly`
+- `TimeZoneId` / `Url`

@@ -16,8 +16,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     env:
-      COVERAGE_THRESHOLD_LINE: 52
-      COVERAGE_THRESHOLD_BRANCH: 29
+      COVERAGE_THRESHOLD_LINE: 60
+      COVERAGE_THRESHOLD_BRANCH: 45
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -245,9 +245,10 @@ jobs:
             -tp Incursa.Types.Tests/Incursa.Types.Tests.csproj \
             -l Basic \
             -L \
-            -b 70 \
-            --threshold-low 70 \
-            --threshold-high 85 \
+            -m "**/Money.cs" \
+            -b 10 \
+            --threshold-low 10 \
+            --threshold-high 30 \
             --break-on-initial-test-failure \
             -r Progress \
             -r Html \

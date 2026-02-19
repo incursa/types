@@ -6,6 +6,7 @@ All notable changes to this project are documented in this file.
 
 ### Added
 - Regression hardening test suite covering strict parsing, boundary semantics, deterministic recurring windows, default-value safety, converter failure behavior, and invariant numeric serialization.
+- Spec-driven low-coverage test suite for `CountryCode`, `CurrencyCode`, `IpAddress`, `PhoneNumber`, `ShortCode`, and `UsaState` covering parse/tryparse, formatting, converter, and serialization contracts.
 - `docs/migration-v2.md` migration guide for breaking hardening changes.
 - Spec-first behavior system under `docs/spec/` (per-type specs, compatibility decisions, and test traceability map).
 - `docs/coverage-ratchet-plan.md` for staged coverage-gate increases to the long-term target.
@@ -24,7 +25,10 @@ All notable changes to this project are documented in this file.
 - `Money` and `Percentage` parse/serialize behavior standardized to invariant culture.
 - `MonthOnly` namespace normalized to `Incursa`.
 - Type converters for several public types now fail fast on invalid input instead of returning default values.
+- Test infrastructure normalized to stable xUnit v2/VSTest package alignment to restore reliable Stryker mutant-to-test mapping.
+- CI quality gates ratcheted to line `60%` / branch `45%`, and mutation gate scoped to `Money.cs` pilot with non-zero threshold.
 
 ### Fixed
 - Conflicting/non-project license header in `Duration`.
 - Multiple silent-invalid-state paths caused by default coercion and permissive converters.
+- `PhoneNumber.GenerateRandom()` now returns parseable E.164 values instead of constructing invalid GUID-based values.
