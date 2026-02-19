@@ -2,45 +2,47 @@
 
 - Type: `TimeZoneId`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents a valid time zone identifier, supporting Windows/IANA forms.
 
 ## Canonical Value Model
-- Backing representation: Canonical IANA/Windows-resolved time zone identity.
-- Canonical string representation: Canonical ID returned by `ToString()`.
+- Backing representation: resolved `TimeZoneInfo` and canonical identifier.
+- Canonical string representation: canonical ID returned by `ToString()`.
 - Equality/comparison basis: Canonical time zone identity.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- Valid IANA or Windows time-zone IDs resolvable by `TZConvert`.
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Null/whitespace values.
+- Unknown or invalid zone identifiers.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- Windows IDs normalize to IANA when available.
+- IANA inputs preserve caller-provided identifier text.
+- Fallback canonical ID uses resolved `TimeZoneInfo` identity when necessary.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- Constructor and `Parse` resolve/validate ID and populate `TimeZoneInfo`.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- `TryParse` returns false/default for invalid inputs.
+- `Parse` throws `ArgumentException` for invalid IDs.
 
 ### Formatting/ToString
 - `ToString()` returns canonical representation.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON and type converters round-trip canonical ID values.
+- Invalid converter input throws via base converter/JSON exceptions.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- Invalid zone ID resolution throws `ArgumentException` wrapping timezone resolution exceptions.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

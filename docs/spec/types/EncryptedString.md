@@ -2,45 +2,48 @@
 
 - Type: `EncryptedString`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents ciphertext-like opaque text with validation constraints.
 
 ## Canonical Value Model
-- Backing representation: Validated encoded string payload.
-- Canonical string representation: Original validated encoded string.
+- Backing representation: validated ciphertext-like base64 string.
+- Canonical string representation: exact input payload (no re-encoding normalization).
 - Equality/comparison basis: Exact encoded payload.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- Non-empty base64 text with length multiple of 4 and decoded byte length >= 12.
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Null/whitespace input.
+- Non-base64 strings.
+- Base64 strings shorter than ciphertext minimum expectations.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- Value is preserved as provided once validated.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- `Parse` and `From` validate payload format/shape before storing.
+- `GenerateRandom` returns parseable base64 ciphertext-like payload.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- `TryParse` returns false/default (or null for nullable overload) on invalid input.
+- `Parse` throws on invalid input.
 
 ### Formatting/ToString
 - `ToString()` returns canonical representation.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON and type converters round-trip payload strings.
+- Invalid converter string input throws `FormatException`/`JsonException`.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- Empty payload -> `ArgumentException`.
+- Invalid base64 shape/content -> `FormatException`.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

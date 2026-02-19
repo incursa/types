@@ -2,45 +2,56 @@
 
 - Type: `JsonContext`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents mutable JSON object context data used for typed and untyped access.
 
 ## Canonical Value Model
-- Backing representation: `JsonObject` payload.
-- Canonical string representation: Serialized JSON object text.
-- Equality/comparison basis: Record struct equality over backing state.
+- Backing representation: `JsonObject`.
+- Canonical string representation: `RawData.ToJsonString()`.
+- Equality/comparison basis: record-struct equality over backing field state.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- `JsonObject` constructor values that are non-null.
+- Dictionary constructors with non-null keys and values compatible with `JsonValue`.
+- `Parse`/`TryParse` text containing a JSON object payload.
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Null `JsonObject` constructor input.
+- `Parse` text that is null/whitespace or not a JSON object.
+- Default (`default(JsonContext)`) mutation calls via `SetData`.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- `TryParse` only accepts JSON object text and returns null/false for malformed content.
+- `RawData` on a default instance resolves to an empty `JsonObject` for reads.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- `new JsonContext(JsonObject)` throws `ArgumentNullException` when null.
+- `Empty()` returns a writable empty object context.
+- `FromObject<T>(null)` returns `Empty()`.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- `TryParse(string)` returns `null` for invalid/malformed content.
+- `TryParse(string, out JsonContext)` returns `false` and `default` on invalid content.
+- `Parse(string)` throws `FormatException` for invalid content.
 
 ### Formatting/ToString
-- `ToString()` returns canonical representation.
+- `ToString()` returns canonical serialized JSON object text.
+- Default instance string form is `{}`.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON converter reads and writes object payloads.
+- Type converter round-trips JSON object strings.
+- Invalid type-converter string input throws `FormatException`.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- Invalid parse input throws `FormatException`.
+- Invalid default mutation throws `InvalidOperationException`.
+- Invalid JSON converter input throws `JsonException`.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

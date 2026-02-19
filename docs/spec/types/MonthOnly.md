@@ -2,45 +2,53 @@
 
 - Type: `MonthOnly`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents a year-month value independent of day and time.
 
 ## Canonical Value Model
-- Backing representation: Month number offset from year 1 month 1.
+- Backing representation: month number offset (`0..119987`).
 - Canonical string representation: `yyyy-MM`.
 - Equality/comparison basis: Month number.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- `new MonthOnly(year, month)` for Gregorian-valid `year`/`month`.
+- `Parse/TryParse` values matching `yy-M`, `yy-MM`, `yyyy-M`, `yyyy-MM`.
+- `Parse/TryParse` values parseable via invariant `DateTime` parsing fallback.
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Null/whitespace or malformed parse text.
+- `FromMonthNumber` outside `0..119987`.
+- `AddMonths` overflow beyond representable range.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- All string formatting normalizes to `yyyy-MM`.
+- Internal representation normalizes to month-number offset.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- Constructor validates Gregorian date parts through `DateOnly`.
+- `FromMonthNumber` validates range and throws on overflow.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- `TryParse` returns false/default for invalid input.
+- `Parse` throws `FormatException` for invalid input.
 
 ### Formatting/ToString
-- `ToString()` returns canonical representation.
+- `ToString()` returns canonical `yyyy-MM`.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON converter accepts only JSON string tokens.
+- JSON and type converters round-trip canonical `yyyy-MM`.
+- Invalid converter input throws format/JSON exceptions.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- `Parse` invalid input -> `FormatException`.
+- `FromMonthNumber` and `AddMonths` overflow -> `ArgumentOutOfRangeException`.
+- `CompareTo(object)` non-`MonthOnly` argument -> `ArgumentException`.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

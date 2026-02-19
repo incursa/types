@@ -16,8 +16,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     env:
-      COVERAGE_THRESHOLD_LINE: 60
-      COVERAGE_THRESHOLD_BRANCH: 45
+      COVERAGE_THRESHOLD_LINE: 65
+      COVERAGE_THRESHOLD_BRANCH: 50
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -246,9 +246,11 @@ jobs:
             -l Basic \
             -L \
             -m "**/Money.cs" \
-            -b 10 \
-            --threshold-low 10 \
-            --threshold-high 30 \
+            -m "**/JsonContext.cs" \
+            -m "**/MonthOnly.cs" \
+            -b 15 \
+            --threshold-low 15 \
+            --threshold-high 35 \
             --break-on-initial-test-failure \
             -r Progress \
             -r Html \

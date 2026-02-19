@@ -2,45 +2,48 @@
 
 - Type: `BvFile`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents binary file content with optional file name and content type metadata.
 
 ## Canonical Value Model
-- Backing representation: `BinaryData`, file name, and content type.
-- Canonical string representation: Binary payload plus associated metadata.
+- Backing representation: `BinaryData` plus immutable `FileName` and `ContentType`.
+- Canonical string representation: not applicable (binary domain object, no custom `ToString` contract).
 - Equality/comparison basis: Record equality over payload and metadata.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- Byte-array, span, stream, `BinaryData`, base64, path, and `FileInfo` constructor/factory inputs.
+- Base64 factory overloads with explicit or default metadata.
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Invalid base64 payloads for `FromBase64`.
+- Null/empty path for `FromPath`.
+- Null `FileInfo` for `FromFileInfo`.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- `FromBase64(base64)` defaults `FileName` to `file` and `ContentType` to `application/octet-stream`.
+- `FromPath` and `FromFileInfo` infer MIME type from file name extension.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- Constructors preserve provided metadata and wrap bytes as `BinaryData`.
+- Factory methods delegate to constructors with validated inputs.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- Not applicable: `BvFile` does not expose `Parse`/`TryParse`.
 
 ### Formatting/ToString
-- `ToString()` returns canonical representation.
+- Not applicable: no dedicated formatting API.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON constructor supports serialization with `BinaryData`, file name, and content type.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- Invalid base64 in `FromBase64` -> `FormatException`.
+- Invalid path/file metadata arguments propagate framework argument exceptions.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

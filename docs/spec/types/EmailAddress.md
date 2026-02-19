@@ -2,45 +2,50 @@
 
 - Type: `EmailAddress`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents a normalized email address and parsed mailbox components.
 
 ## Canonical Value Model
-- Backing representation: `MailAddress`-derived normalized value.
-- Canonical string representation: Lowercase local/domain representation used by `ToString()`.
+- Backing representation: normalized address string plus `MailAddress`.
+- Canonical string representation: lowercase local + `@` + lowercase ASCII (IDN mapped) domain.
 - Equality/comparison basis: Normalized email value.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- Standard mailbox syntax accepted by `MimeKit.MailboxAddress.Parse`.
+- Optional display-name forms (for example `Jane Doe <jane@example.com>`).
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Null/whitespace input.
+- Inputs without exactly one `@` in parsed mailbox address.
+- Malformed mailbox text rejected by parser.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- Local part is trimmed and lowercased.
+- Domain part is trimmed, IDN-mapped to ASCII, and lowercased.
+- `ToString()` returns normalized address text.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- `Parse` and `From` enforce normalization and validation.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- `TryParse` returns false/default (or null for nullable overload) on invalid input.
+- `Parse` throws on invalid input.
 
 ### Formatting/ToString
-- `ToString()` returns canonical representation.
+- `ToString()` returns normalized canonical address string.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON converter round-trips canonical string.
+- Type converter round-trips canonical string and throws `FormatException` for invalid text.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- Parse failures propagate parser exceptions or argument exceptions.
+- JSON converter invalid input throws `JsonException`.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

@@ -2,45 +2,49 @@
 
 - Type: `Url`
 - Namespace: `Incursa`
-- Status: `Draft`
+- Status: `Approved`
 - Last Updated: `2026-02-19`
 
 ## Domain Purpose
 Represents a valid normalized URL value.
 
 ## Canonical Value Model
-- Backing representation: `Uri` value.
-- Canonical string representation: Normalized absolute URI string.
+- Backing representation: `Uri` plus absolute/relative indicator.
+- Canonical string representation: `Uri.ToString()` after normalization.
 - Equality/comparison basis: Normalized URI value.
 
 ## Input Contract
 ### Accepted
-- Valid inputs for constructor/factory/parse APIs that can be normalized into the canonical model.
+- Valid absolute or relative URI text accepted by `Uri.TryCreate(..., RelativeOrAbsolute)`.
 
 ### Rejected
-- `null`, empty, or malformed values that violate type invariants.
+- Null/whitespace input.
+- Text not parseable as a URI.
 
 ## Normalization Rules
-- Normalize input to canonical representation on construction and parse paths.
+- Absolute URLs normalize scheme and host to lowercase.
+- Default ports are removed for `http` (`80`) and `https` (`443`).
+- Empty absolute paths normalize to `/`.
+- Relative references are preserved without absolute normalization.
 
 ## Public API Behavior
 ### Construction
-- `Parse` throws for invalid values.
-- Constructors/factories enforce invariants and normalize canonical form.
+- Constructor/`Parse` validate and normalize to canonical URI.
 
 ### Parse/TryParse
-- `TryParse` never throws and returns `false`/`null` on invalid input.
-- `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
+- `TryParse` returns false/default on invalid input.
+- `Parse` throws `ArgumentException` for invalid input.
 
 ### Formatting/ToString
 - `ToString()` returns canonical representation.
 
 ### Converters/Serialization
-- JSON and type converters round-trip canonical values.
-- Invalid converter inputs fail fast with explicit exceptions.
+- JSON and type converters round-trip canonical URL text.
+- Invalid JSON converter input throws `JsonException`.
 
 ## Error Contracts
-- Invalid input raises parse/format exceptions based on API contract.
+- Invalid URL parse throws `ArgumentException`.
+- Invalid JSON conversion throws `JsonException`.
 
 ## Compatibility Notes
 - Behavior changes from previous runtime semantics require an entry in `docs/spec/compat-decisions.md`.

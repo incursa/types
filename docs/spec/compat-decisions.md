@@ -19,3 +19,18 @@ Case-by-case decisions when desired behavior differs from current behavior.
 - Required actions:
   - update `Money` runtime normalization
   - update money tests and docs
+
+### DEC-002: Random generator outputs must be parseable canonical values
+- Date: 2026-02-19
+- Type: `EmailAddress`
+- Prior behavior: `GenerateRandom()` constructed GUID-only text and failed type invariants.
+- New behavior: `GenerateRandom()` emits a canonical parseable email (`<random>@example.test`).
+- Decision: **Approved**
+- Rationale:
+  - generator APIs must produce values valid for their own parse/constructor contracts
+  - prevents flaky downstream failures in tests and seed-data flows
+- Migration impact:
+  - callers relying on previous invalid payload shape must update expectations
+- Required actions:
+  - update runtime generator implementation
+  - add generator contract test coverage

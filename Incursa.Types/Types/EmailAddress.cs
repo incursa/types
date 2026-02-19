@@ -14,6 +14,7 @@
 
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Cryptography;
 using CommunityToolkit.Diagnostics;
 
 
@@ -149,7 +150,8 @@ public readonly partial record struct EmailAddress
 
     public static EmailAddress GenerateRandom()
     {
-        return new EmailAddress(Guid.NewGuid().ToString("N"));
+        string localPart = Convert.ToHexString(RandomNumberGenerator.GetBytes(12)).ToLowerInvariant();
+        return new EmailAddress($"{localPart}@example.test");
     }
 
     public class EmailAddressJsonConverter : JsonConverter<EmailAddress>
