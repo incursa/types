@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/_src/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="NOTICE" />
+    <File Path="README.md" />
+    <File Path="stylecop.json" />
+  </Folder>
+  <Project Path="Incursa.Types.Tests/Incursa.Types.Tests.csproj" />
+  <Project Path="Incursa.Types/Incursa.Types.csproj" />
+</Solution>

@@ -1,6 +1,6 @@
 # Future value objects
 
-These candidates complement the existing Bravellian.Types primitives. Each item includes suggested behaviors to validate before adding to the package surface.
+These candidates complement the existing Incursa.Types primitives. Each item includes suggested behaviors to validate before adding to the package surface.
 
 ## Contact and identity
 - **ShortName/DisplayName**: Unicode-safe display names with length and script validation for user-facing labels.

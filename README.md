@@ -1,20 +1,20 @@
-# Bravellian.Types
+# Incursa.Types
 
-A set of reusable value objects and helper abstractions that can be shared across Bravellian services and libraries. The package focuses on predictable formatting/parsing, deterministic identifiers, and strong typing for common domain concepts.
+A set of reusable value objects and helper abstractions that can be shared across Incursa services and libraries. The package focuses on predictable formatting/parsing, deterministic identifiers, and strong typing for common domain concepts.
 
 ## Installation
 
 ```bash
 # using dotnet CLI
-dotnet add package Bravellian.Types
+dotnet add package Incursa.Types
 ```
 
-The library currently targets **.NET 10.0**. If your solution uses an earlier target, enable multi-targeting in your project file or add a `TargetFramework` compatible with .NET 10 when consuming the package locally.
+The library currently targets **.NET 8.0**. If your solution uses an earlier target, enable multi-targeting in your project file or add a `TargetFramework` compatible with .NET 8 when consuming the package locally.
 
 ## Quick start
 
 ```csharp
-using Bravellian;
+using Incursa;
 
 // Money and Percentage
 var subtotal = new Money(12.34m);
@@ -46,7 +46,7 @@ Console.WriteLine(maybeEmail.GetValueOrDefault("no-email@example.com"));
 dotnet test
 
 # build the library only
-dotnet build Bravellian.Types/Bravellian.Types.csproj
+dotnet build Incursa.Types/Incursa.Types.csproj
 
 # verify formatting and StyleCop rules before committing
 dotnet format --verify-no-changes
@@ -56,7 +56,7 @@ dotnet format --verify-no-changes
 
 * The repository ships with **StyleCop** rules (`stylecop.json`) and Roslyn analyzers; keep warnings at zero. The CI pipeline runs `dotnet format --verify-no-changes` to enforce the `.editorconfig` conventions (four-space indentation, `var` for implicit local types where clear, and UTF-8 encoding).
 * Enable XML documentation on public APIs. When adding new types, include `<summary>` and parameter remarks so reference docs stay complete.
-* Use `dotnet pack Bravellian.Types/Bravellian.Types.csproj -p:ContinuousIntegrationBuild=true -o ./artifacts` to validate the NuGet package layout locally. Packages are generated on build because `GeneratePackageOnBuild` is enabled.
+* Use `dotnet pack Incursa.Types/Incursa.Types.csproj -p:ContinuousIntegrationBuild=true -o ./artifacts` to validate the NuGet package layout locally. Packages are generated on build because `GeneratePackageOnBuild` is enabled.
 
 ## Type catalog
 

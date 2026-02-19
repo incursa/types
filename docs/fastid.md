@@ -21,4 +21,4 @@ A monotonic timestamp produces time-ordered IDs while still allowing ~1 billion 
 ## Usage tips
 * For APIs requiring stable pagination or ordering, prefer FastId over GUID to keep sort order aligned with creation time.
 * When persistence compatibility matters, store both the 64-bit `Value` and the encoded string to simplify debugging.
-* Consider multi-targeting consumers if they do not yet build on .NET 10.0.
+* Consider multi-targeting consumers if they do not yet build on \.NET 8.0.

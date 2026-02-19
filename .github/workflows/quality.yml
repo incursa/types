@@ -30,16 +30,16 @@ jobs:
           global-json-file: global.json
 
       - name: Restore
-        run: dotnet restore Bravellian.Core.slnx
+        run: dotnet restore Incursa.Core.slnx
 
       - name: Verify formatting and analyzers
-        run: dotnet format --verify-no-changes Bravellian.Core.slnx
+        run: dotnet format --verify-no-changes Incursa.Core.slnx
 
       - name: Build (deterministic)
-        run: dotnet build Bravellian.Core.slnx --no-restore --configuration Release -warnaserror -p:ContinuousIntegrationBuild=true
+        run: dotnet build Incursa.Core.slnx --no-restore --configuration Release -warnaserror -p:ContinuousIntegrationBuild=true
 
       - name: Test
-        run: dotnet test Bravellian.Core.slnx --no-build --configuration Release
+        run: dotnet test Incursa.Core.slnx --no-build --configuration Release
 
       - name: Pack (repro 1)
         shell: bash
@@ -48,7 +48,7 @@ jobs:
           rm -rf artifacts/repro1 artifacts/repro2
           mkdir -p artifacts/repro1 artifacts/repro2
 
-          dotnet pack ./Bravellian.Core.slnx \
+          dotnet pack ./Incursa.Core.slnx \
             -c Release \
             -p:ContinuousIntegrationBuild=true \
             -p:Deterministic=true \
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          dotnet pack ./Bravellian.Core.slnx \
+          dotnet pack ./Incursa.Core.slnx \
             -c Release \
             -p:ContinuousIntegrationBuild=true \
             -p:Deterministic=true \

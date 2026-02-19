@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<!-- Keep core project references and build tooling -->
-	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Bravellian.Database')) == false">
+	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj' AND '$(MSBuildProjectExtension)' != '.sqlproj' AND $(MSBuildProjectName.StartsWith('Incursa.Database')) == false">
 		<RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
 
 		<!-- Keep InternalsVisibleTo -->
