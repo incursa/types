@@ -14,6 +14,7 @@
 
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Cryptography;
 using CommunityToolkit.Diagnostics;
 
 
@@ -152,8 +153,17 @@ public readonly partial record struct PhoneNumber
 
     public static PhoneNumber GenerateRandom()
     {
-        return new PhoneNumber(Guid.NewGuid().ToString("N"));
+        int index = RandomNumberGenerator.GetInt32(ValidSeedNumbers.Length);
+        return new PhoneNumber(ValidSeedNumbers[index]);
     }
+
+    private static readonly string[] ValidSeedNumbers =
+    [
+        "+12025550123",
+        "+14155552671",
+        "+442070313000",
+        "+61293744000",
+    ];
 
     public class PhoneNumberJsonConverter : JsonConverter<PhoneNumber>
     {
