@@ -312,6 +312,7 @@ jobs:
             -r Progress \
             -r Html \
             -r Markdown \
+            -r Json \
             -O artifacts/stryker \
             --skip-version-check
 
@@ -402,13 +403,21 @@ jobs:
           if [[ "$package_status" != "✅" || "$deterministic_status" != "✅" ]]; then overall="❌ Failed"; fi
           if [[ "$MUTATION_RESULT" == "failure" || "$mutation_status" == "❌" ]]; then overall="❌ Failed"; fi
 
+          reporting_status="✅"
+          reporting_notes="all expected metrics captured"
+          if [[ -z "${TESTS_PASSED:-}" || -z "${TESTS_FAILED:-}" || -z "${COVERAGE_LINE_PCT:-}" || -z "${COVERAGE_BRANCH_PCT:-}" || -z "${PACKAGE_COUNT:-}" ]]; then
+            reporting_status="⚠️"
+            reporting_notes="some metrics unavailable; inspect quality metrics artifacts"
+          fi
+
           gate_rows=""
           gate_rows+="| 🧪 Tests | ${tests_status} | ${TESTS_PASSED:-0} pass / ${tests_failed} fail / ${TESTS_SKIPPED:-0} skipped | 0 fails | ${VERIFY_RESULT} verify job |\n"
           gate_rows+="| 📊 Coverage (Line) | ${line_status} | ${COVERAGE_LINE_PCT:-0}% | >= ${COVERAGE_LINE_THRESHOLD:-65}% | Branch ${COVERAGE_BRANCH_PCT:-0}% |\n"
           gate_rows+="| 📊 Coverage (Branch) | ${branch_status} | ${COVERAGE_BRANCH_PCT:-0}% | >= ${COVERAGE_BRANCH_THRESHOLD:-50}% | Line ${COVERAGE_LINE_PCT:-0}% |\n"
           gate_rows+="| 📦 Packaging | ${package_status} | ${PACKAGE_COUNT:-0} packages | >= 1 | ${PACKAGE_VERSIONS:-metrics missing} |\n"
           gate_rows+="| 📦 Determinism | ${deterministic_status} | normalized package compare | pass | reproducible pack check |\n"
-          gate_rows+="| 🧬 Mutation | ${mutation_status} | ${mutation_metric} | ${mutation_threshold} | ${mutation_notes} |"
+          gate_rows+="| 🧬 Mutation | ${mutation_status} | ${mutation_metric} | ${mutation_threshold} | ${mutation_notes} |\n"
+          gate_rows+="| 📝 Reporting Metrics | ${reporting_status} | metric extraction | best-effort | ${reporting_notes} |"
 
           artifact_rows="- \`coverage-report\` (coverage HTML + markdown)\n"
           artifact_rows+="- \`quality-verify-metrics\` (tests/coverage/package JSON)\n"

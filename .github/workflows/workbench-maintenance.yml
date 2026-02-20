@@ -148,6 +148,13 @@ jobs:
           fi
           if [[ "${PR_STATUS:-❌}" == "❌" ]]; then overall="❌ Failed"; fi
 
+          reporting_status="✅"
+          reporting_notes="all expected metrics captured"
+          if [[ -z "${SYNC_STATUS:-}" || -z "${NORMALIZE_STATUS:-}" || -z "${VALIDATE_STATUS:-}" || -z "${PR_STATUS:-}" ]]; then
+            reporting_status="⚠️"
+            reporting_notes="some metrics unavailable; inspect workbench-maintenance-metrics"
+          fi
+
           pr_metric="no PR URL returned"
           pr_notes="maintenance may have found no changes"
           if [[ -n "${PR_URL:-}" ]]; then
@@ -159,7 +166,8 @@ jobs:
           gate_rows+="| Workbench sync | ${SYNC_STATUS:-❌} | items/docs/nav sync | must pass | scheduled/manual maintenance |\n"
           gate_rows+="| Work item normalize | ${NORMALIZE_STATUS:-❌} | normalize --include-done | must pass | keeps item metadata coherent |\n"
           gate_rows+="| Workbench validate | ${VALIDATE_STATUS:-❌} | validate --strict | must pass | final state gate |\n"
-          gate_rows+="| 📦 Maintenance PR | ${PR_STATUS:-❌} | ${pr_metric} | PR-based mutation | ${pr_notes} |"
+          gate_rows+="| 📦 Maintenance PR | ${PR_STATUS:-❌} | ${pr_metric} | PR-based mutation | ${pr_notes} |\n"
+          gate_rows+="| 📝 Reporting Metrics | ${reporting_status} | metric extraction | best-effort | ${reporting_notes} |"
 
           artifact_rows="- \`workbench-maintenance-metrics\` (gate and PR status JSON)"
 

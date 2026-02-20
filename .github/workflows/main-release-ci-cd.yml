@@ -193,11 +193,19 @@ jobs:
           fi
           if [[ "$PUBLISH_RESULT" == "failure" ]]; then overall="❌ Failed"; fi
 
+          reporting_status="✅"
+          reporting_notes="all expected metrics captured"
+          if [[ -z "${TESTS_PASSED:-}" || -z "${TESTS_FAILED:-}" || -z "${PACKAGE_COUNT:-}" ]]; then
+            reporting_status="⚠️"
+            reporting_notes="some metrics unavailable; inspect main-release-ci-metrics artifact"
+          fi
+
           gate_rows=""
           gate_rows+="| Build | ${build_status} | ${BUILD_RESULT} | success | Version ${SEMVER:-unknown} |\n"
           gate_rows+="| 🧪 Tests | ${test_status} | ${TESTS_PASSED:-0} pass / ${TESTS_FAILED:-0} fail / ${TESTS_SKIPPED:-0} skipped | 0 fails | Unit tests |\n"
           gate_rows+="| 📦 Packaging | ${package_status} | ${PACKAGE_COUNT:-0} packages | >= 1 | ${PACKAGE_VERSIONS:-metrics missing} |\n"
-          gate_rows+="| 🚀 Publish | ${publish_status} | ${publish_metric} | ${publish_threshold} | ${publish_notes} |"
+          gate_rows+="| 🚀 Publish | ${publish_status} | ${publish_metric} | ${publish_threshold} | ${publish_notes} |\n"
+          gate_rows+="| 📝 Reporting Metrics | ${reporting_status} | metric extraction | best-effort | ${reporting_notes} |"
 
           artifact_rows="- \`nupkgs\` (built package artifacts)\n- \`main-release-ci-metrics\` (test/package JSON)"
 

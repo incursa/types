@@ -102,10 +102,18 @@ jobs:
             overall="❌ Failed"
           fi
 
+          reporting_status="✅"
+          reporting_notes="all expected metrics captured"
+          if [[ -z "${VALIDATE_STATUS:-}" || -z "${NORMALIZE_STATUS:-}" || -z "${NAV_STATUS:-}" ]]; then
+            reporting_status="⚠️"
+            reporting_notes="some metrics unavailable; inspect workbench-verify-metrics"
+          fi
+
           gate_rows=""
           gate_rows+="| Workbench validate | ${VALIDATE_STATUS:-❌} | strict validation | must pass | repo workbench config/state |\n"
           gate_rows+="| Work item normalize (dry-run) | ${NORMALIZE_STATUS:-❌} | dry-run executed | must pass | detects pending item normalization |\n"
-          gate_rows+="| Nav sync (dry-run) | ${NAV_STATUS:-❌} | dry-run executed | must pass | detects pending docs/nav updates |"
+          gate_rows+="| Nav sync (dry-run) | ${NAV_STATUS:-❌} | dry-run executed | must pass | detects pending docs/nav updates |\n"
+          gate_rows+="| 📝 Reporting Metrics | ${reporting_status} | metric extraction | best-effort | ${reporting_notes} |"
 
           artifact_rows="- \`workbench-verify-metrics\` (gate status JSON)"
 
