@@ -8,6 +8,10 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    outputs:
+      validate_status: ${{ steps.validate_status.outputs.validate_status }}
+      normalize_status: ${{ steps.normalize_status.outputs.normalize_status }}
+      nav_status: ${{ steps.nav_status.outputs.nav_status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,9 +25,98 @@ jobs:
         run: dotnet tool restore
 
       - name: Validate workbench state
+        id: validate
         run: dotnet tool run workbench validate --strict
 
-      - name: Detect pending normalization and nav changes
+      - name: Detect pending normalization changes
+        id: normalize
+        run: dotnet tool run workbench item normalize --include-done --dry-run
+
+      - name: Detect pending nav changes
+        id: nav
+        run: dotnet tool run workbench nav sync --include-done --force --dry-run
+
+      - name: Export validate status
+        if: always()
+        id: validate_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.validate.outcome }}
         run: |
-          dotnet tool run workbench item normalize --include-done --dry-run
-          dotnet tool run workbench nav sync --include-done --force --dry-run
+          if [[ "$OUTCOME" == "success" ]]; then echo "validate_status=✅" >> "$GITHUB_OUTPUT"; else echo "validate_status=❌" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Export normalize status
+        if: always()
+        id: normalize_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.normalize.outcome }}
+        run: |
+          if [[ "$OUTCOME" == "success" ]]; then echo "normalize_status=✅" >> "$GITHUB_OUTPUT"; else echo "normalize_status=❌" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Export nav status
+        if: always()
+        id: nav_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.nav.outcome }}
+        run: |
+          if [[ "$OUTCOME" == "success" ]]; then echo "nav_status=✅" >> "$GITHUB_OUTPUT"; else echo "nav_status=❌" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Write verify metrics JSON
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p artifacts/ci-metrics/workbench-verify
+          cat > artifacts/ci-metrics/workbench-verify/metrics.json <<JSON
+          {"validate":"${{ steps.validate.outcome }}","normalize":"${{ steps.normalize.outcome }}","nav":"${{ steps.nav.outcome }}"}
+          JSON
+
+      - name: Upload workbench verify metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-verify-metrics
+          path: artifacts/ci-metrics/workbench-verify/metrics.json
+
+  report:
+    name: Workbench Verify Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [verify]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Render workbench verify summary
+        shell: bash
+        env:
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          VALIDATE_STATUS: ${{ needs.verify.outputs.validate_status }}
+          NORMALIZE_STATUS: ${{ needs.verify.outputs.normalize_status }}
+          NAV_STATUS: ${{ needs.verify.outputs.nav_status }}
+        run: |
+          overall="✅ Passed"
+          if [[ "$VERIFY_RESULT" != "success" ]]; then overall="❌ Failed"; fi
+          if [[ "${VALIDATE_STATUS:-❌}" != "✅" || "${NORMALIZE_STATUS:-❌}" != "✅" || "${NAV_STATUS:-❌}" != "✅" ]]; then
+            overall="❌ Failed"
+          fi
+
+          gate_rows=""
+          gate_rows+="| Workbench validate | ${VALIDATE_STATUS:-❌} | strict validation | must pass | repo workbench config/state |\n"
+          gate_rows+="| Work item normalize (dry-run) | ${NORMALIZE_STATUS:-❌} | dry-run executed | must pass | detects pending item normalization |\n"
+          gate_rows+="| Nav sync (dry-run) | ${NAV_STATUS:-❌} | dry-run executed | must pass | detects pending docs/nav updates |"
+
+          artifact_rows="- \`workbench-verify-metrics\` (gate status JSON)"
+
+          actions=""
+          if [[ "$overall" != "✅ Passed" ]]; then
+            actions="- Run failing Workbench command locally with the same flags.\n- Inspect \`workbench-verify-metrics\` to confirm which gate failed."
+          fi
+
+          SUMMARY_TITLE="Workbench Verify Summary" \
+          SUMMARY_RESULT="$overall" \
+          SUMMARY_GATE_ROWS="$gate_rows" \
+          SUMMARY_ARTIFACT_ROWS="$artifact_rows" \
+          SUMMARY_ACTIONS="$actions" \
+          bash scripts/ci/render-workflow-summary.sh

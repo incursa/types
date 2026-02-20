@@ -1,11 +1,11 @@
-name: 'Continuous Integration on Commit'
+name: "Continuous Integration on Commit"
 on:
   workflow_dispatch:
   merge_group:
   push:
     branches-ignore:
-      - main          # Do NOT run on main
-      - 'release/**'  # Do NOT run on any release/* branch
+      - main
+      - "release/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,80 +15,115 @@ jobs:
   build:
     name: Standard Commit - Build, Test, and Scan
     runs-on: ubuntu-latest
+    outputs:
+      semver: ${{ steps.git_version.outputs.semVer }}
+      tests_passed: ${{ steps.test_metrics.outputs.tests_passed }}
+      tests_failed: ${{ steps.test_metrics.outputs.tests_failed }}
+      tests_skipped: ${{ steps.test_metrics.outputs.tests_skipped }}
+      tests_status: ${{ steps.test_metrics.outputs.tests_status }}
+      package_count: ${{ steps.package_metrics.outputs.package_count }}
+      package_status: ${{ steps.package_metrics.outputs.package_status }}
+      package_versions: ${{ steps.package_metrics.outputs.package_versions }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Set-up dotnet
-      uses: actions/setup-dotnet@v4
-      with:
-        global-json-file: global.json
+      - name: Set-up dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
 
-    - name: Cache NuGet
-      uses: actions/cache@v4
-      with:
-        path: ~/.nuget/packages
-        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          nuget-${{ runner.os }}-
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
-    - name: Install PowerShell
-      uses: PSModule/install-powershell@v1
+      - name: Install PowerShell
+        uses: PSModule/install-powershell@v1
 
-    - name: Determine Version
-      id: git_version
-      shell: pwsh
-      run: |
-        $now = [System.DateTime]::UtcNow
-        $revision = $now.Hour * 60 + $now.Minute
-        $baseVersion = "$($now.Year).$($now.Month).$($now.Day).$revision"
-        $version = $baseVersion
+      - name: Determine Version
+        id: git_version
+        shell: pwsh
+        run: |
+          $now = [System.DateTime]::UtcNow
+          $revision = $now.Hour * 60 + $now.Minute
+          $baseVersion = "$($now.Year).$($now.Month).$($now.Day).$revision"
+          $version = $baseVersion
 
-        try {
-          $branchName = (git rev-parse --abbrev-ref HEAD).Trim()
-          Write-Host "Branch name: $branchName"
-          $mainBranches = @("main", "master")
+          try {
+            $branchName = (git rev-parse --abbrev-ref HEAD).Trim()
+            Write-Host "Branch name: $branchName"
+            $mainBranches = @("main", "master")
 
-          if ($branchName -and ($mainBranches -notcontains $branchName.ToLowerInvariant())) {
-            # Sanitize branch name for pre-release tag
-            $safeBranch = $branchName -replace '[^A-Za-z0-9-]', '-'
-            $version = "$baseVersion-$safeBranch"
+            if ($branchName -and ($mainBranches -notcontains $branchName.ToLowerInvariant())) {
+              $safeBranch = $branchName -replace '[^A-Za-z0-9-]', '-'
+              $version = "$baseVersion-$safeBranch"
+            }
+          } catch {
+            Write-Warning "Could not determine git branch. Using base version."
           }
-        } catch {
-          Write-Warning "Could not determine git branch. Using base version."
-        }
 
-        Write-Host "Calculated Version: $version"
-        echo "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "Calculated Version: $version"
+          echo "semVer=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-    - name: Restore dependencies
-      run: dotnet restore Incursa.Core.slnx
+      - name: Restore dependencies
+        run: dotnet restore Incursa.Core.slnx
 
-    - name: Restore tools
-      run: dotnet tool restore
+      - name: Restore tools
+        run: dotnet tool restore
 
-    - name: Build solution
-      run: dotnet build Incursa.Core.slnx --no-restore --configuration Release -p:Version=${{ steps.git_version.outputs.semVer }}
+      - name: Build solution
+        run: dotnet build Incursa.Core.slnx --no-restore --configuration Release -p:Version=${{ steps.git_version.outputs.semVer }}
 
-    - name: Run Tests
-      run: dotnet test Incursa.Core.slnx --no-build --configuration Release
+      - name: Run Tests
+        run: dotnet test Incursa.Core.slnx --no-build --configuration Release --results-directory ./TestResults --logger "trx;LogFileName=commit-tests.trx"
 
-    - name: Pack NuGet packages
-      run: dotnet pack Incursa.Core.slnx --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+      - name: Collect test metrics
+        id: test_metrics
+        if: always()
+        shell: bash
+        run: |
+          trx_file="$(find TestResults -name commit-tests.trx | head -n1 || true)"
+          if [[ -z "$trx_file" ]]; then trx_file="missing.trx"; fi
+          bash scripts/ci/collect-test-metrics.sh "$trx_file" artifacts/ci-metrics/commit/test.json "$GITHUB_OUTPUT"
 
-    - name: Upload package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nupkgs
-        path: ./nupkgs/*.nupkg
+      - name: Pack NuGet packages
+        run: dotnet pack Incursa.Core.slnx --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
 
-  publish-github-packages:
+      - name: Collect package metrics
+        id: package_metrics
+        if: always()
+        shell: bash
+        run: |
+          bash scripts/ci/collect-package-metrics.sh nupkgs artifacts/ci-metrics/commit/packages.json "$GITHUB_OUTPUT"
+
+      - name: Upload package artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: ./nupkgs/*.nupkg
+
+      - name: Upload commit metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: commit-ci-metrics
+          path: artifacts/ci-metrics/commit
+
+  publish_github_packages:
     needs: build
     runs-on: ubuntu-latest
-    # Pre-release = contains hyphen (e.g., 1.2.3-pre.4)
     if: ${{ contains(github.ref_name, '-') }}
+    outputs:
+      publish_status: ${{ steps.publish_status.outputs.publish_status }}
+      publish_target: ${{ steps.publish_status.outputs.publish_target }}
+      publish_count: ${{ steps.publish_status.outputs.publish_count }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -104,3 +139,86 @@ jobs:
             --store-password-in-clear-text
       - name: Push to GitHub Packages
         run: dotnet nuget push "out/*.nupkg" --source "github" --skip-duplicate
+      - name: Export publish metrics
+        id: publish_status
+        if: always()
+        shell: bash
+        run: |
+          count="$(find out -name '*.nupkg' | wc -l | tr -d ' ')"
+          echo "publish_status=✅" >> "$GITHUB_OUTPUT"
+          echo "publish_target=GitHub Packages" >> "$GITHUB_OUTPUT"
+          echo "publish_count=${count:-0}" >> "$GITHUB_OUTPUT"
+
+  report:
+    name: Commit CI Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [build, publish_github_packages]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Render commit summary
+        shell: bash
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          PUBLISH_RESULT: ${{ needs.publish_github_packages.result }}
+          TESTS_PASSED: ${{ needs.build.outputs.tests_passed }}
+          TESTS_FAILED: ${{ needs.build.outputs.tests_failed }}
+          TESTS_SKIPPED: ${{ needs.build.outputs.tests_skipped }}
+          TESTS_STATUS: ${{ needs.build.outputs.tests_status }}
+          PACKAGE_COUNT: ${{ needs.build.outputs.package_count }}
+          PACKAGE_STATUS: ${{ needs.build.outputs.package_status }}
+          PACKAGE_VERSIONS: ${{ needs.build.outputs.package_versions }}
+          SEMVER: ${{ needs.build.outputs.semver }}
+          PUBLISH_STATUS: ${{ needs.publish_github_packages.outputs.publish_status }}
+          PUBLISH_TARGET: ${{ needs.publish_github_packages.outputs.publish_target }}
+          PUBLISH_COUNT: ${{ needs.publish_github_packages.outputs.publish_count }}
+        run: |
+          build_status="✅"
+          if [[ "$BUILD_RESULT" != "success" ]]; then build_status="❌"; fi
+
+          test_status="${TESTS_STATUS:-❌}"
+          if [[ "${TESTS_FAILED:-0}" != "0" ]]; then test_status="❌"; fi
+
+          package_status="${PACKAGE_STATUS:-❌}"
+          publish_status="⚠️"
+          publish_metric="skipped"
+          publish_threshold="branch prerelease"
+          publish_notes="job skipped by branch rule"
+          if [[ "$PUBLISH_RESULT" == "success" ]]; then
+            publish_status="${PUBLISH_STATUS:-✅}"
+            publish_metric="${PUBLISH_COUNT:-0} package(s)"
+            publish_threshold=">= 1 when publish runs"
+            publish_notes="${PUBLISH_TARGET:-GitHub Packages}"
+          elif [[ "$PUBLISH_RESULT" == "failure" ]]; then
+            publish_status="❌"
+            publish_metric="publish failed"
+            publish_notes="check publish-github-packages logs"
+          fi
+
+          overall="✅ Passed"
+          if [[ "$build_status" != "✅" || "$test_status" != "✅" || "$package_status" != "✅" ]]; then
+            overall="❌ Failed"
+          fi
+          if [[ "$PUBLISH_RESULT" == "failure" ]]; then overall="❌ Failed"; fi
+
+          gate_rows=""
+          gate_rows+="| Build | ${build_status} | ${BUILD_RESULT} | success | Version ${SEMVER:-unknown} |\n"
+          gate_rows+="| 🧪 Tests | ${test_status} | ${TESTS_PASSED:-0} pass / ${TESTS_FAILED:-0} fail / ${TESTS_SKIPPED:-0} skipped | 0 fails | Unit tests |\n"
+          gate_rows+="| 📦 Packaging | ${package_status} | ${PACKAGE_COUNT:-0} packages | >= 1 | ${PACKAGE_VERSIONS:-metrics missing} |\n"
+          gate_rows+="| 🚀 Publish | ${publish_status} | ${publish_metric} | ${publish_threshold} | ${publish_notes} |"
+
+          artifact_rows="- \`nupkgs\` (built package artifacts)\n- \`commit-ci-metrics\` (test/package JSON)"
+
+          actions=""
+          if [[ "$overall" != "✅ Passed" ]]; then
+            actions="- Open workflow logs for the failed gate row.\n- Inspect \`commit-ci-metrics\` for extracted values."
+          fi
+
+          SUMMARY_TITLE="Commit CI Summary" \
+          SUMMARY_RESULT="$overall" \
+          SUMMARY_GATE_ROWS="$gate_rows" \
+          SUMMARY_ARTIFACT_ROWS="$artifact_rows" \
+          SUMMARY_ACTIONS="$actions" \
+          bash scripts/ci/render-workflow-summary.sh

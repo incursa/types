@@ -13,6 +13,12 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    outputs:
+      sync_status: ${{ steps.sync_status.outputs.sync_status }}
+      normalize_status: ${{ steps.normalize_status.outputs.normalize_status }}
+      validate_status: ${{ steps.validate_status.outputs.validate_status }}
+      pr_status: ${{ steps.pr_status.outputs.pr_status }}
+      pr_url: ${{ steps.cpr.outputs.pull-request-url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,15 +33,22 @@ jobs:
       - name: Restore tools
         run: dotnet tool restore
 
-      - name: Run workbench sync
+      - name: Sync items/docs/nav
+        id: sync_step
         env:
           WORKBENCH_GITHUB_TOKEN: ${{ secrets.WORKBENCH_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
-        run: |
-          dotnet tool run workbench sync --items --docs --nav --include-done --force
-          dotnet tool run workbench item normalize --include-done
-          dotnet tool run workbench validate --strict
+        run: dotnet tool run workbench sync --items --docs --nav --include-done --force
+
+      - name: Normalize work items
+        id: normalize_step
+        run: dotnet tool run workbench item normalize --include-done
+
+      - name: Validate workbench state
+        id: validate_step
+        run: dotnet tool run workbench validate --strict
 
       - name: Create pull request
+        id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.WORKBENCH_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
@@ -47,3 +60,117 @@ jobs:
             - sync items/docs/nav
             - normalize work items
             - strict validation
+
+      - name: Export sync status
+        if: always()
+        id: sync_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.sync_step.outcome }}
+        run: |
+          if [[ "$OUTCOME" == "success" ]]; then echo "sync_status=✅" >> "$GITHUB_OUTPUT"; else echo "sync_status=❌" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Export normalize status
+        if: always()
+        id: normalize_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.normalize_step.outcome }}
+        run: |
+          if [[ "$OUTCOME" == "success" ]]; then echo "normalize_status=✅" >> "$GITHUB_OUTPUT"; else echo "normalize_status=❌" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Export validate status
+        if: always()
+        id: validate_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.validate_step.outcome }}
+        run: |
+          if [[ "$OUTCOME" == "success" ]]; then echo "validate_status=✅" >> "$GITHUB_OUTPUT"; else echo "validate_status=❌" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Export PR status
+        if: always()
+        id: pr_status
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.cpr.outcome }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+        run: |
+          if [[ "$OUTCOME" == "success" ]]; then
+            if [[ -n "$PR_URL" ]]; then
+              echo "pr_status=✅" >> "$GITHUB_OUTPUT"
+            else
+              echo "pr_status=⚠️" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "pr_status=❌" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Write maintenance metrics JSON
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p artifacts/ci-metrics/workbench-maintenance
+          cat > artifacts/ci-metrics/workbench-maintenance/metrics.json <<JSON
+          {"sync":"${{ steps.sync_step.outcome }}","normalize":"${{ steps.normalize_step.outcome }}","validate":"${{ steps.validate_step.outcome }}","pr":"${{ steps.cpr.outcome }}","pr_url":"${{ steps.cpr.outputs.pull-request-url }}"}
+          JSON
+
+      - name: Upload maintenance metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-maintenance-metrics
+          path: artifacts/ci-metrics/workbench-maintenance/metrics.json
+
+  report:
+    name: Workbench Maintenance Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [sync]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Render maintenance summary
+        shell: bash
+        env:
+          SYNC_RESULT: ${{ needs.sync.result }}
+          SYNC_STATUS: ${{ needs.sync.outputs.sync_status }}
+          NORMALIZE_STATUS: ${{ needs.sync.outputs.normalize_status }}
+          VALIDATE_STATUS: ${{ needs.sync.outputs.validate_status }}
+          PR_STATUS: ${{ needs.sync.outputs.pr_status }}
+          PR_URL: ${{ needs.sync.outputs.pr_url }}
+        run: |
+          overall="✅ Passed"
+          if [[ "$SYNC_RESULT" != "success" ]]; then overall="❌ Failed"; fi
+          if [[ "${SYNC_STATUS:-❌}" != "✅" || "${NORMALIZE_STATUS:-❌}" != "✅" || "${VALIDATE_STATUS:-❌}" != "✅" ]]; then
+            overall="❌ Failed"
+          fi
+          if [[ "${PR_STATUS:-❌}" == "❌" ]]; then overall="❌ Failed"; fi
+
+          pr_metric="no PR URL returned"
+          pr_notes="maintenance may have found no changes"
+          if [[ -n "${PR_URL:-}" ]]; then
+            pr_metric="[PR link](${PR_URL})"
+            pr_notes="maintenance changes proposed"
+          fi
+
+          gate_rows=""
+          gate_rows+="| Workbench sync | ${SYNC_STATUS:-❌} | items/docs/nav sync | must pass | scheduled/manual maintenance |\n"
+          gate_rows+="| Work item normalize | ${NORMALIZE_STATUS:-❌} | normalize --include-done | must pass | keeps item metadata coherent |\n"
+          gate_rows+="| Workbench validate | ${VALIDATE_STATUS:-❌} | validate --strict | must pass | final state gate |\n"
+          gate_rows+="| 📦 Maintenance PR | ${PR_STATUS:-❌} | ${pr_metric} | PR-based mutation | ${pr_notes} |"
+
+          artifact_rows="- \`workbench-maintenance-metrics\` (gate and PR status JSON)"
+
+          actions=""
+          if [[ "$overall" != "✅ Passed" ]]; then
+            actions="- Re-run workflow with \`workflow_dispatch\` after fixing failing command.\n- Check maintenance metrics artifact and create-pull-request logs."
+          fi
+
+          SUMMARY_TITLE="Workbench Maintenance Summary" \
+          SUMMARY_RESULT="$overall" \
+          SUMMARY_GATE_ROWS="$gate_rows" \
+          SUMMARY_ARTIFACT_ROWS="$artifact_rows" \
+          SUMMARY_ACTIONS="$actions" \
+          bash scripts/ci/render-workflow-summary.sh

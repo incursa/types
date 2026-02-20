@@ -21,6 +21,21 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
+    outputs:
+      tests_passed: ${{ steps.test_metrics.outputs.tests_passed }}
+      tests_failed: ${{ steps.test_metrics.outputs.tests_failed }}
+      tests_skipped: ${{ steps.test_metrics.outputs.tests_skipped }}
+      tests_status: ${{ steps.test_metrics.outputs.tests_status }}
+      coverage_line_pct: ${{ steps.coverage_metrics.outputs.coverage_line_pct }}
+      coverage_branch_pct: ${{ steps.coverage_metrics.outputs.coverage_branch_pct }}
+      coverage_line_threshold: ${{ steps.coverage_metrics.outputs.coverage_line_threshold }}
+      coverage_branch_threshold: ${{ steps.coverage_metrics.outputs.coverage_branch_threshold }}
+      coverage_line_status: ${{ steps.coverage_metrics.outputs.coverage_line_status }}
+      coverage_branch_status: ${{ steps.coverage_metrics.outputs.coverage_branch_status }}
+      package_count: ${{ steps.package_metrics.outputs.package_count }}
+      package_versions: ${{ steps.package_metrics.outputs.package_versions }}
+      package_status: ${{ steps.package_metrics.outputs.package_status }}
+      deterministic_status: ${{ steps.deterministic.outputs.deterministic_status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,17 +55,22 @@ jobs:
         run: ./scripts/verify-type-specs.ps1
 
       - name: Verify formatting and analyzers
+        id: format
         run: dotnet format --verify-no-changes Incursa.Core.slnx
 
       - name: Build (deterministic)
+        id: build
         run: dotnet build Incursa.Core.slnx --no-restore --configuration Release -warnaserror -p:ContinuousIntegrationBuild=true
 
       - name: Test with coverage gate
+        id: test_coverage
         run: |
           # Ratcheting baseline: increase these values toward long-term 85/85 as coverage expands.
           dotnet test Incursa.Core.slnx \
             --no-build \
             --configuration Release \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=quality-tests.trx" \
             /p:CollectCoverage=true \
             /p:CoverletOutput=./TestResults/Coverage/ \
             /p:CoverletOutputFormat=cobertura \
@@ -58,16 +78,39 @@ jobs:
             /p:ThresholdType=line%2cbranch \
             /p:ThresholdStat=total
 
+      - name: Collect test metrics
+        id: test_metrics
+        if: always()
+        shell: bash
+        run: |
+          trx_file="$(find TestResults -name quality-tests.trx | head -n1 || true)"
+          if [[ -z "$trx_file" ]]; then
+            trx_file="missing.trx"
+          fi
+          bash scripts/ci/collect-test-metrics.sh "$trx_file" artifacts/ci-metrics/quality/test.json "$GITHUB_OUTPUT"
+
       - name: Create coverage summary
+        if: always()
         run: |
           dotnet tool install --tool-path .tools dotnet-reportgenerator-globaltool --version 5.*
           ./.tools/reportgenerator \
             "-reports:**/coverage.cobertura.xml" \
             "-targetdir:artifacts/coverage-report" \
             "-reporttypes:HtmlInline;MarkdownSummaryGithub"
-          cat artifacts/coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Collect coverage metrics
+        id: coverage_metrics
+        if: always()
+        shell: bash
+        run: |
+          coverage_file="$(find . -name coverage.cobertura.xml | head -n1 || true)"
+          if [[ -z "$coverage_file" ]]; then
+            coverage_file="missing.xml"
+          fi
+          bash scripts/ci/collect-coverage-metrics.sh "$coverage_file" "$COVERAGE_THRESHOLD_LINE" "$COVERAGE_THRESHOLD_BRANCH" artifacts/ci-metrics/quality/coverage.json "$GITHUB_OUTPUT"
 
       - name: Upload coverage artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -102,15 +145,12 @@ jobs:
             -o artifacts/repro2 \
             --no-restore
 
-
       - name: Compare nupkg contents (normalized, multi-package)
         id: compare
         shell: bash
         run: |
           set -euo pipefail
 
-          # Creates a deterministic "manifest" for a .nupkg by hashing the extracted contents,
-          # excluding known non-deterministic OPC metadata produced by NuGet pack.
           normalize_manifest() {
             local nupkg="$1"
             local out="$2"
@@ -118,28 +158,19 @@ jobs:
             dir="$(mktemp -d)"
 
             unzip -q "$nupkg" -d "$dir"
-
-            # Remove known non-deterministic pack metadata:
-            # - OPC core-properties part name is GUID-based
-            # - _rels/.rels references that GUID-based part name
             rm -f "$dir/_rels/.rels" || true
             rm -f "$dir/package/services/metadata/core-properties/"*.psmdcp || true
-
-            # Hash remaining files deterministically (stable ordering)
             (
               cd "$dir"
               find . -type f -print0 | sort -z | xargs -0 sha256sum
             ) > "$out"
-
             rm -rf "$dir"
           }
 
-          # Compare two packages and print a useful diff (file list + per-file hash diff)
           compare_packages() {
             local p1="$1"
             local p2="$2"
             local name="$3"
-
             local m1="/tmp/${name}.repro1.manifest"
             local m2="/tmp/${name}.repro2.manifest"
 
@@ -150,30 +181,22 @@ jobs:
               echo "::group::❌ Package differs (normalized): $name"
               echo "repro1: $p1"
               echo "repro2: $p2"
-              echo ""
-              echo "Diff (sha256sum lines):"
               cat "/tmp/${name}.diff"
               echo "::endgroup::"
               return 1
-            else
-              echo "✅ Deterministic (normalized): $name"
             fi
+            echo "✅ Deterministic (normalized): $name"
           }
 
           mkdir -p /tmp/nupkg-diff
-
-          # Collect all nupkgs in each folder
           mapfile -t P1 < <(ls -1 artifacts/repro1/*.nupkg 2>/dev/null | sort)
           mapfile -t P2 < <(ls -1 artifacts/repro2/*.nupkg 2>/dev/null | sort)
 
           if [[ "${#P1[@]}" -eq 0 || "${#P2[@]}" -eq 0 ]]; then
             echo "No .nupkg files found in one or both directories."
-            echo "repro1 count: ${#P1[@]}"
-            echo "repro2 count: ${#P2[@]}"
             exit 1
           fi
 
-          # Compare sets by filename (basename)
           printf "%s\n" "${P1[@]##*/}" | sort > /tmp/repro1.names
           printf "%s\n" "${P2[@]##*/}" | sort > /tmp/repro2.names
 
@@ -184,12 +207,10 @@ jobs:
             exit 1
           fi
 
-          # Build lookup maps basename -> full path
           declare -A MAP1 MAP2
           for p in "${P1[@]}"; do MAP1["$(basename "$p")"]="$p"; done
           for p in "${P2[@]}"; do MAP2["$(basename "$p")"]="$p"; done
 
-          # Compare each package
           failed=0
           while IFS= read -r name; do
             if ! compare_packages "${MAP1[$name]}" "${MAP2[$name]}" "$name"; then
@@ -198,10 +219,29 @@ jobs:
           done < /tmp/repro1.names
 
           if [[ "$failed" -ne 0 ]]; then
-            echo ""
             echo "One or more packages were not deterministic (normalized)."
             exit 1
           fi
+
+      - name: Export deterministic packaging status
+        id: deterministic
+        if: always()
+        shell: bash
+        env:
+          COMPARE_OUTCOME: ${{ steps.compare.outcome }}
+        run: |
+          if [[ "$COMPARE_OUTCOME" == "success" ]]; then
+            echo "deterministic_status=✅" >> "$GITHUB_OUTPUT"
+          else
+            echo "deterministic_status=❌" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Collect packaging metrics
+        id: package_metrics
+        if: always()
+        shell: bash
+        run: |
+          bash scripts/ci/collect-package-metrics.sh artifacts/repro1 artifacts/ci-metrics/quality/packages.json "$GITHUB_OUTPUT"
 
       - name: Upload normalized package diffs
         if: failure() && steps.compare.outcome == 'failure'
@@ -215,12 +255,26 @@ jobs:
             /tmp/repro2.names
             /tmp/nupkg-names.diff
 
+      - name: Upload verify metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-verify-metrics
+          path: artifacts/ci-metrics/quality
+
   mutation:
     name: Mutation Testing (Stryker)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: verify
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    outputs:
+      mutation_score: ${{ steps.mutation_metrics.outputs.mutation_score }}
+      mutation_threshold: ${{ steps.mutation_metrics.outputs.mutation_threshold }}
+      mutation_killed: ${{ steps.mutation_metrics.outputs.mutation_killed }}
+      mutation_survived: ${{ steps.mutation_metrics.outputs.mutation_survived }}
+      mutation_no_coverage: ${{ steps.mutation_metrics.outputs.mutation_no_coverage }}
+      mutation_status: ${{ steps.mutation_metrics.outputs.mutation_status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -239,6 +293,7 @@ jobs:
         run: dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
 
       - name: Run mutation tests
+        id: stryker
         run: |
           ./.tools/dotnet-stryker \
             -p Incursa.Types/Incursa.Types.csproj \
@@ -260,9 +315,116 @@ jobs:
             -O artifacts/stryker \
             --skip-version-check
 
+      - name: Collect mutation metrics
+        id: mutation_metrics
+        if: always()
+        shell: bash
+        run: |
+          bash scripts/ci/collect-mutation-metrics.sh artifacts/stryker artifacts/ci-metrics/quality/mutation.json "$GITHUB_OUTPUT"
+
       - name: Upload mutation artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mutation-report
           path: artifacts/stryker
+
+      - name: Upload mutation metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-mutation-metrics
+          path: artifacts/ci-metrics/quality/mutation.json
+
+  report:
+    name: Quality Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [verify, mutation]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Render quality summary
+        shell: bash
+        env:
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          MUTATION_RESULT: ${{ needs.mutation.result }}
+          TESTS_PASSED: ${{ needs.verify.outputs.tests_passed }}
+          TESTS_FAILED: ${{ needs.verify.outputs.tests_failed }}
+          TESTS_SKIPPED: ${{ needs.verify.outputs.tests_skipped }}
+          TESTS_STATUS: ${{ needs.verify.outputs.tests_status }}
+          COVERAGE_LINE_PCT: ${{ needs.verify.outputs.coverage_line_pct }}
+          COVERAGE_BRANCH_PCT: ${{ needs.verify.outputs.coverage_branch_pct }}
+          COVERAGE_LINE_THRESHOLD: ${{ needs.verify.outputs.coverage_line_threshold }}
+          COVERAGE_BRANCH_THRESHOLD: ${{ needs.verify.outputs.coverage_branch_threshold }}
+          COVERAGE_LINE_STATUS: ${{ needs.verify.outputs.coverage_line_status }}
+          COVERAGE_BRANCH_STATUS: ${{ needs.verify.outputs.coverage_branch_status }}
+          PACKAGE_COUNT: ${{ needs.verify.outputs.package_count }}
+          PACKAGE_VERSIONS: ${{ needs.verify.outputs.package_versions }}
+          PACKAGE_STATUS: ${{ needs.verify.outputs.package_status }}
+          DETERMINISTIC_STATUS: ${{ needs.verify.outputs.deterministic_status }}
+          MUTATION_SCORE: ${{ needs.mutation.outputs.mutation_score }}
+          MUTATION_THRESHOLD: ${{ needs.mutation.outputs.mutation_threshold }}
+          MUTATION_STATUS: ${{ needs.mutation.outputs.mutation_status }}
+          MUTATION_KILLED: ${{ needs.mutation.outputs.mutation_killed }}
+          MUTATION_SURVIVED: ${{ needs.mutation.outputs.mutation_survived }}
+          MUTATION_NO_COVERAGE: ${{ needs.mutation.outputs.mutation_no_coverage }}
+        run: |
+          tests_failed="${TESTS_FAILED:-0}"
+          tests_status="${TESTS_STATUS:-❌}"
+          if [[ "$tests_failed" != "0" ]]; then tests_status="❌"; fi
+          if [[ -z "${TESTS_PASSED:-}" ]]; then tests_status="❌"; fi
+
+          line_status="${COVERAGE_LINE_STATUS:-❌}"
+          branch_status="${COVERAGE_BRANCH_STATUS:-❌}"
+          package_status="${PACKAGE_STATUS:-❌}"
+          deterministic_status="${DETERMINISTIC_STATUS:-❌}"
+
+          mutation_status="⚠️"
+          mutation_metric="not run"
+          mutation_threshold=">= 35"
+          mutation_notes="job skipped"
+          if [[ "$MUTATION_RESULT" == "success" ]]; then
+            mutation_status="${MUTATION_STATUS:-❌}"
+            mutation_metric="${MUTATION_SCORE:-0}% killed"
+            mutation_threshold=">= ${MUTATION_THRESHOLD:-35}%"
+            mutation_notes="Killed ${MUTATION_KILLED:-0}; Survived ${MUTATION_SURVIVED:-0}; NoCoverage ${MUTATION_NO_COVERAGE:-0}"
+          elif [[ "$MUTATION_RESULT" == "failure" ]]; then
+            mutation_status="❌"
+            mutation_notes="mutation job failed"
+          fi
+
+          overall="✅ Passed"
+          if [[ "$VERIFY_RESULT" != "success" ]]; then overall="❌ Failed"; fi
+          if [[ "$line_status" != "✅" || "$branch_status" != "✅" ]]; then overall="❌ Failed"; fi
+          if [[ "$tests_status" != "✅" ]]; then overall="❌ Failed"; fi
+          if [[ "$package_status" != "✅" || "$deterministic_status" != "✅" ]]; then overall="❌ Failed"; fi
+          if [[ "$MUTATION_RESULT" == "failure" || "$mutation_status" == "❌" ]]; then overall="❌ Failed"; fi
+
+          gate_rows=""
+          gate_rows+="| 🧪 Tests | ${tests_status} | ${TESTS_PASSED:-0} pass / ${tests_failed} fail / ${TESTS_SKIPPED:-0} skipped | 0 fails | ${VERIFY_RESULT} verify job |\n"
+          gate_rows+="| 📊 Coverage (Line) | ${line_status} | ${COVERAGE_LINE_PCT:-0}% | >= ${COVERAGE_LINE_THRESHOLD:-65}% | Branch ${COVERAGE_BRANCH_PCT:-0}% |\n"
+          gate_rows+="| 📊 Coverage (Branch) | ${branch_status} | ${COVERAGE_BRANCH_PCT:-0}% | >= ${COVERAGE_BRANCH_THRESHOLD:-50}% | Line ${COVERAGE_LINE_PCT:-0}% |\n"
+          gate_rows+="| 📦 Packaging | ${package_status} | ${PACKAGE_COUNT:-0} packages | >= 1 | ${PACKAGE_VERSIONS:-metrics missing} |\n"
+          gate_rows+="| 📦 Determinism | ${deterministic_status} | normalized package compare | pass | reproducible pack check |\n"
+          gate_rows+="| 🧬 Mutation | ${mutation_status} | ${mutation_metric} | ${mutation_threshold} | ${mutation_notes} |"
+
+          artifact_rows="- \`coverage-report\` (coverage HTML + markdown)\n"
+          artifact_rows+="- \`quality-verify-metrics\` (tests/coverage/package JSON)\n"
+          artifact_rows+="- \`mutation-report\` and \`quality-mutation-metrics\`\n"
+          artifact_rows+="- \`nupkg-normalized-diffs\` (on determinism failure)"
+
+          actions=""
+          if [[ "$overall" != "✅ Passed" ]]; then
+            actions="- Check failed gate rows above and open the corresponding artifact first.\n"
+            actions+="- For coverage failures, inspect \`coverage-report\`.\n"
+            actions+="- For mutation failures, inspect \`mutation-report\`."
+          fi
+
+          SUMMARY_TITLE="CI Quality Summary" \
+          SUMMARY_RESULT="$overall" \
+          SUMMARY_GATE_ROWS="$gate_rows" \
+          SUMMARY_ARTIFACT_ROWS="$artifact_rows" \
+          SUMMARY_ACTIONS="$actions" \
+          bash scripts/ci/render-workflow-summary.sh
