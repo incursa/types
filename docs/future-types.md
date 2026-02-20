@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/future-types.md"
+  path: /docs/future-types.md
+---
+
 # Future value objects
 
 These candidates complement the existing Incursa.Types primitives. Each item includes suggested behaviors to validate before adding to the package surface.

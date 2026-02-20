@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/fastid.md"
+  path: /docs/fastid.md
+---
+
 # FastId reference
 
 `FastId` is a 64-bit, time-sortable identifier intended as a lightweight alternative to GUIDs. It uses a custom epoch and Crockford Base32 encoding to keep the encoded string short, URL-safe, and lexicographically ordered by time.

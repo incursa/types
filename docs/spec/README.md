@@ -1,4 +1,14 @@
-﻿# Behavioral Specification Guide
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/README.md"
+  path: /docs/spec/README.md
+---
+
+# Behavioral Specification Guide
 
 This directory is the source of truth for expected behavior of public concrete types in `Incursa.Types`.
 

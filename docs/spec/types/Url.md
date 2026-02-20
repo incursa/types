@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/Url.md"
+  path: /docs/spec/types/Url.md
+---
+
 # Url Behavioral Specification
 
 - Type: `Url`

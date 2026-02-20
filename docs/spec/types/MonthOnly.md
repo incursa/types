@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/MonthOnly.md"
+  path: /docs/spec/types/MonthOnly.md
+---
+
 # MonthOnly Behavioral Specification
 
 - Type: `MonthOnly`

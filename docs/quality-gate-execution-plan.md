@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/quality-gate-execution-plan.md"
+  path: /docs/quality-gate-execution-plan.md
+---
+
 # Quality Gate Execution Plan
 
 This document tracks the six-step cleanup and hardening workstream.

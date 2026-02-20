@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/Maybe.md"
+  path: /docs/spec/types/Maybe.md
+---
+
 # Maybe Behavioral Specification
 
 - Type: `Maybe`

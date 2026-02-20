@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/coverage-ratchet-plan.md"
+  path: /docs/coverage-ratchet-plan.md
+---
+
 # Coverage Ratchet Plan
 
 This repo uses a ratcheting strategy to move coverage gates to the long-term target without breaking delivery on an existing low baseline.

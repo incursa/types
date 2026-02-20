@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/VirtualPath.md"
+  path: /docs/spec/types/VirtualPath.md
+---
+
 # VirtualPath Behavioral Specification
 
 - Type: `VirtualPath`

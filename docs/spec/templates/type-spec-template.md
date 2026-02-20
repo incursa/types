@@ -1,4 +1,14 @@
-﻿# Type Spec Template
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/templates/type-spec-template.md"
+  path: /docs/spec/templates/type-spec-template.md
+---
+
+# Type Spec Template
 
 - Type: `<TypeName>`
 - Namespace: `Incursa`

@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/JsonContext.md"
+  path: /docs/spec/types/JsonContext.md
+---
+
 # JsonContext Behavioral Specification
 
 - Type: `JsonContext`

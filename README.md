@@ -96,7 +96,7 @@ dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
 * **EncryptedString** – validated Base64 ciphertext wrapper (rejects plain text input).
 * **Networking** – `Url`, `IpAddress`, and `CidrRange` provide safe parsing and containment helpers.
 
-See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md). Behavioral specifications are versioned in [`docs/spec/types`](docs/spec/types). Remaining candidate primitives are cataloged in [`docs/future-types.md`](docs/future-types.md).
+See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md). Behavioral specifications are versioned in [`docs/spec/README.md`](docs/spec/README.md). Remaining candidate primitives are cataloged in [`docs/future-types.md`](docs/future-types.md).
 
 ## Contributing
 

@@ -1,4 +1,14 @@
-﻿# Compatibility Decisions
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/compat-decisions.md"
+  path: /docs/spec/compat-decisions.md
+---
+
+# Compatibility Decisions
 
 Case-by-case decisions when desired behavior differs from current behavior.
 

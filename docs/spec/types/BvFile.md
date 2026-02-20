@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/BvFile.md"
+  path: /docs/spec/types/BvFile.md
+---
+
 # BvFile Behavioral Specification
 
 - Type: `BvFile`

@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/migration-v2.md"
+  path: /docs/migration-v2.md
+---
+
 # Migration guide: hardened v2 behavior
 
 This release hardens type invariants and removes several silent-failure paths.

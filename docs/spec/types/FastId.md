@@ -1,4 +1,14 @@
-﻿# FastId Behavioral Specification
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/FastId.md"
+  path: /docs/spec/types/FastId.md
+---
+
+# FastId Behavioral Specification
 
 - Type: `FastId`
 - Namespace: `Incursa`

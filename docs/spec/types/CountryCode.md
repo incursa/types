@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/CountryCode.md"
+  path: /docs/spec/types/CountryCode.md
+---
+
 # CountryCode Behavioral Specification
 
 - Type: `CountryCode`

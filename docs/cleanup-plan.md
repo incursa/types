@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/cleanup-plan.md"
+  path: /docs/cleanup-plan.md
+---
+
 # Incursa.Types hardening plan
 
 ## Documentation and discoverability

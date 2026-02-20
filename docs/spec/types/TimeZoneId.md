@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/TimeZoneId.md"
+  path: /docs/spec/types/TimeZoneId.md
+---
+
 # TimeZoneId Behavioral Specification
 
 - Type: `TimeZoneId`

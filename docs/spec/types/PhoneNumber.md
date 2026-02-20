@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/PhoneNumber.md"
+  path: /docs/spec/types/PhoneNumber.md
+---
+
 # PhoneNumber Behavioral Specification
 
 - Type: `PhoneNumber`

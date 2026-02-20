@@ -1,4 +1,14 @@
-﻿# Percentage Behavioral Specification
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/Percentage.md"
+  path: /docs/spec/types/Percentage.md
+---
+
+# Percentage Behavioral Specification
 
 - Type: `Percentage`
 - Namespace: `Incursa`

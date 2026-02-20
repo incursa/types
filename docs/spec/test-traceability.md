@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/test-traceability.md"
+  path: /docs/spec/test-traceability.md
+---
+
 # Spec to Test Traceability
 
 This file maps behavioral specification clauses to concrete tests.

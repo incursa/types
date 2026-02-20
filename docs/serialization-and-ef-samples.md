@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/serialization-and-ef-samples.md"
+  path: /docs/serialization-and-ef-samples.md
+---
+
 # Serialization and EF Core samples
 
 The types in this library ship with JSON converters and type converters for predictable persistence. The snippets below illustrate usage patterns for both serialization and Entity Framework Core.

@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/types.md"
+  path: /docs/types.md
+---
+
 # Type reference
 
 This document provides quick guidance for the most commonly used value objects. Each type includes XML documentation in-source and participates in JSON serialization through built-in converters.

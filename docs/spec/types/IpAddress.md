@@ -1,3 +1,13 @@
+---
+workbench:
+  type: doc
+  workItems: []
+  codeRefs: []
+  pathHistory:
+    - "C:/docs/spec/types/IpAddress.md"
+  path: /docs/spec/types/IpAddress.md
+---
+
 # IpAddress Behavioral Specification
 
 - Type: `IpAddress`
