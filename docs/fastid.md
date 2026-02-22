@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/fastid.md"
+    - "/C:/docs/fastid.md"
   path: /docs/fastid.md
 ---
 

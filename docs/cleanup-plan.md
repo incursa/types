@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/cleanup-plan.md"
+    - "/C:/docs/cleanup-plan.md"
   path: /docs/cleanup-plan.md
 ---
 

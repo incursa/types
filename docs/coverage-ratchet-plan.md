@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/coverage-ratchet-plan.md"
+    - "/C:/docs/coverage-ratchet-plan.md"
   path: /docs/coverage-ratchet-plan.md
 ---
 
