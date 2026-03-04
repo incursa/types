@@ -1,0 +1,5 @@
+{
+  "name": "AclKey",
+  "namespace": "Incursa",
+  "regex": "(?-i:\\Aacl:(?<version>v[1-9]\\d*):org:(?<orgId>[A-Za-z0-9._-]{1,128}):actor:(?<actorId>[A-Za-z0-9._-]{1,128}):res:(?<resourcePath>(?<segment>[A-Za-z0-9._-]{1,128}(?::[A-Za-z0-9._-]{1,128})*)(?:/(?<segment>[A-Za-z0-9._-]{1,128}(?::[A-Za-z0-9._-]{1,128})*))*)\\z)"
+}

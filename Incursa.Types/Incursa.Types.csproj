@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -24,6 +24,12 @@
     <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.4.0" />
     <PackageReference Include="Cronos" Version="0.11.1" />
     <PackageReference Include="Humanizer.Core" Version="3.0.1" />
+      <PackageReference Include="Incursa.Generators" Version="2026.2.19.38">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <OutputItemType>Analyzer</OutputItemType>
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </PackageReference>
     <PackageReference Include="libphonenumber-csharp" Version="9.0.21" />
     <PackageReference Include="TimeZoneConverter" Version="7.0.0" />
     <PackageReference Include="MimeKit" Version="4.14.0" />
