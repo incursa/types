@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/spec/types/JsonContext.md"
+    - "/C:/docs/spec/types/JsonContext.md"
   path: /docs/spec/types/JsonContext.md
 ---
 

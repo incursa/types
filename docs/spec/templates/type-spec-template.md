@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/spec/templates/type-spec-template.md"
+    - "/C:/docs/spec/templates/type-spec-template.md"
   path: /docs/spec/templates/type-spec-template.md
 ---
 

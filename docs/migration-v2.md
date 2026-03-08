@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/migration-v2.md"
+    - "/C:/docs/migration-v2.md"
   path: /docs/migration-v2.md
 ---
 

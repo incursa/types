@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/spec/compat-decisions.md"
+    - "/C:/docs/spec/compat-decisions.md"
   path: /docs/spec/compat-decisions.md
 ---
 

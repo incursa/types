@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/serialization-and-ef-samples.md"
+    - "/C:/docs/serialization-and-ef-samples.md"
   path: /docs/serialization-and-ef-samples.md
 ---
 

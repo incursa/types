@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/spec/test-traceability.md"
+    - "/C:/docs/spec/test-traceability.md"
   path: /docs/spec/test-traceability.md
 ---
 

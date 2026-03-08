@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/spec/types/Money.md"
+    - "/C:/docs/spec/types/Money.md"
   path: /docs/spec/types/Money.md
 ---
 

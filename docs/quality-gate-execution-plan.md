@@ -4,7 +4,7 @@ workbench:
   workItems: []
   codeRefs: []
   pathHistory:
-    - "C:/docs/quality-gate-execution-plan.md"
+    - "/C:/docs/quality-gate-execution-plan.md"
   path: /docs/quality-gate-execution-plan.md
 ---
 
