@@ -82,6 +82,18 @@ public readonly record struct ShortCode : IBvParsable<ShortCode>, IParsable<Shor
             throw new ArgumentOutOfRangeException(nameof(length), $"ShortCode length must be between {MinLength} and {MaxLength}.");
         }
 
+        while (true)
+        {
+            var candidate = GenerateCandidate(length);
+            if (ShortCodeGenerationPolicy.IsAcceptable(candidate))
+            {
+                return candidate;
+            }
+        }
+    }
+
+    private static string GenerateCandidate(int length)
+    {
         var charsLength = (byte)Chars.Length;
 
         var sb = new StringBuilder();

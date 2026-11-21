@@ -59,3 +59,20 @@ Case-by-case decisions when desired behavior differs from current behavior.
 - Required actions:
   - guard year/month ranges before construction
   - add boundary and invalid-component tests
+
+### DEC-004: `ShortCode` content safety applies only to generation
+- Date: 2026-11-21
+- Type: `ShortCode`
+- Prior behavior: random generation accepted every structurally valid candidate.
+- New behavior: random generation discards candidates containing curated unwanted fragments—including profanity, slurs, hostile slang, multilingual terms, and supported digit substitutions—and retries.
+- Decision: **Approved**
+- Rationale:
+  - prevents accidentally issuing user-visible codes with objectionable content across common languages
+  - limits policy cost to code generation rather than every parse or use
+  - preserves all previously issued structurally valid codes
+- Migration impact:
+  - the distribution of newly generated codes excludes disallowed candidates
+  - construction and parsing behavior are unchanged
+- Required actions:
+  - add a deterministic generation-policy helper and tests
+  - document the generation-only compatibility boundary

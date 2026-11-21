@@ -54,6 +54,7 @@ This file maps behavioral specification clauses to concrete tests.
 | SHORTCODE-TRYPARSE-001 | `docs/spec/types/ShortCode.md` / Parse/TryParse | `Incursa.Types.Tests.SpecDrivenLowCoverageTypesTests.ShortCode_Parse_Generate_Format_And_Converters_AreConsistent` | Implemented |
 | SHORTCODE-FORMAT-001 | `docs/spec/types/ShortCode.md` / Formatting/ToString | `Incursa.Types.Tests.SpecDrivenLowCoverageTypesTests.ShortCode_Parse_Generate_Format_And_Converters_AreConsistent` | Implemented |
 | SHORTCODE-CONVERT-001 | `docs/spec/types/ShortCode.md` / Converters/Serialization | `Incursa.Types.Tests.SpecDrivenLowCoverageTypesTests.ShortCode_Parse_Generate_Format_And_Converters_AreConsistent` | Implemented |
+| SHORTCODE-GENERATE-SAFETY-001 | `docs/spec/types/ShortCode.md` / Generation | `Incursa.Types.Tests.ShortCodeGenerationPolicyTests` | Implemented |
 | BVFILE-CONSTRUCT-001 | `docs/spec/types/BvFile.md` / Construction | `Incursa.Types.Tests.AdditionalValueObjectTests.BvFile_FromBase64_CapturesMetadata` | Implemented |
 | BVFILE-PARSE-001 | `docs/spec/types/BvFile.md` / Parse/TryParse | `Incursa.Types.Tests.SpecDrivenSupportingTypesTests.BvFile_FromBase64_DefaultOverload_UsesDefaults` | Implemented |
 | BVFILE-TRYPARSE-001 | `docs/spec/types/BvFile.md` / Factory Validation | `Incursa.Types.Tests.SpecDrivenWaveOneHardeningTests.BvFile_PathFactories_ValidateInputs_AndResolveMimeTypes` | Implemented |

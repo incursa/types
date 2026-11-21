@@ -20,6 +20,7 @@ All notable changes to this project are documented in this file.
 
 ### Changed
 - `ShortCode` converted to strict value semantics (`readonly record struct`) with validated parsing.
+- `ShortCode` generation now rejects curated multilingual profanity, slurs, hostile slang, and supported digit substitutions without changing parsing compatibility.
 - `Duration` canonical formatting/comparison corrected, including negative component round-tripping and zero canonical form (`P0D`).
 - `Period.Contains` and `Period.Overlaps` corrected to strict half-open interval semantics (`[start, end)`).
 - `RecurringPeriod.GetPeriod` now derives windows deterministically from provided `startUtc`.

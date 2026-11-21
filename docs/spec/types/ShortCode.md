@@ -38,6 +38,14 @@ Represents a validated short alphanumeric code with canonical normalized formatt
 - `Parse` throws for invalid values.
 - Constructors/factories enforce invariants and normalize canonical form.
 
+### Generation
+- Random generation rejects candidates containing a curated set of unwanted fragments and retries until an acceptable candidate is produced.
+- The generation policy also recognizes digit substitutions supported by the short-code alphabet.
+- The policy applies only to newly generated values. Construction and parsing continue to accept all structurally valid codes for backward compatibility.
+- The policy covers high-confidence profanity, slurs, and hostile slang in English, Spanish, French, German, Dutch, Italian, Portuguese, and Latin-script Arabic where the terms can be represented by the short-code alphabet.
+- Inclusion means a fragment is unsuitable for an uncontextualized, randomly generated public code; it does not assert that the term is universally offensive in every identity, cultural, or reclaimed use.
+- Vocabulary is curated from the MIT-licensed [`cuss`](https://github.com/words/cuss) dataset and the public-domain [`censor-text/profanity-list`](https://github.com/censor-text/profanity-list), then reviewed rather than imported wholesale. No external corpus is loaded at runtime.
+
 ### Parse/TryParse
 - `TryParse` never throws and returns `false`/`null` on invalid input.
 - `Parse` delegates to validated parsing and throws type-appropriate exceptions on invalid input.
@@ -62,3 +70,4 @@ Represents a validated short alphanumeric code with canonical normalized formatt
   - SHORTCODE-TRYPARSE-001
   - SHORTCODE-FORMAT-001
   - SHORTCODE-CONVERT-001
+  - SHORTCODE-GENERATE-SAFETY-001
