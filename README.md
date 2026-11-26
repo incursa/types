@@ -2,9 +2,9 @@
 
 A set of reusable value objects and helper abstractions that can be shared across Incursa services and libraries. The package focuses on predictable formatting/parsing, deterministic identifiers, and strong typing for common domain concepts.
 
-## Release status
+## Migration guidance
 
-The current hardening release introduces **breaking behavioral changes** to improve safety. Review migration notes before upgrading:
+Review the migration notes before upgrading across a major version:
 
 - [`docs/migration-v2.md`](docs/migration-v2.md)
 - [`CHANGELOG.md`](CHANGELOG.md)
@@ -17,7 +17,7 @@ The current hardening release introduces **breaking behavioral changes** to impr
 dotnet add package Incursa.Types
 ```
 
-The library currently targets **.NET 8.0**. If your solution uses an earlier target, enable multi-targeting in your project file or add a `TargetFramework` compatible with .NET 8 when consuming the package locally.
+The library targets **.NET 8.0**. If your solution uses an earlier target, enable multi-targeting in your project file or add a `TargetFramework` compatible with .NET 8 when consuming the package locally.
 
 ## Quick start
 
@@ -96,7 +96,7 @@ dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
 * **EncryptedString** – validated Base64 ciphertext wrapper (rejects plain text input).
 * **Networking** – `Url`, `IpAddress`, and `CidrRange` provide safe parsing and containment helpers.
 
-See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md). Behavioral specifications are versioned in [`docs/spec/README.md`](docs/spec/README.md). Remaining candidate primitives are cataloged in [`docs/future-types.md`](docs/future-types.md).
+See [`docs/types.md`](docs/types.md) and [`docs/fastid.md`](docs/fastid.md) for deeper notes and guidance. JSON/EF Core conversion snippets live in [`docs/serialization-and-ef-samples.md`](docs/serialization-and-ef-samples.md). Behavioral specifications are versioned in [`docs/spec/README.md`](docs/spec/README.md). The design checklist for additional value objects is in [`docs/future-types.md`](docs/future-types.md).
 
 ## Contributing
 

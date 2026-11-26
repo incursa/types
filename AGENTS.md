@@ -46,3 +46,4 @@ dotnet tool run workbench migrate coherent-v1
 
 - Verification workflows must stay read-only (`validate`, dry-run normalization/nav checks).
 - Mutating Workbench operations run in maintenance automation and must open a PR instead of pushing directly to `main`.
+- Keep durable documentation free of branch, commit, deployment, point-in-time validation, test-count, package-count, exact-latest-version, and unfinished-work status. Put release history in `CHANGELOG.md` and active planning in Workbench work items.
