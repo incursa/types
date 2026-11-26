@@ -8,25 +8,29 @@ workbench:
   path: /docs/future-types.md
 ---
 
-# Future value objects
+# Value object design checklist
 
-These candidates complement the existing Incursa.Types primitives. Each item includes suggested behaviors to validate before adding to the package surface.
+Use this checklist when evaluating an additional `Incursa.Types` value object. Candidate tracking belongs in Workbench work items or issues, not in this durable design guide.
 
-## Contact and identity
-- **ShortName/DisplayName**: Unicode-safe display names with length and script validation for user-facing labels.
+## Contract questions
 
-## Locale and geography
-- **Country**/**CountryCode**: Implemented. Future work: localized display names and optional data downloads for non-ISO territories.
-- **TimeZoneId**: Implemented. Future work: expose offset helpers and caching for hosted services.
-- **CurrencyCode**: Implemented. Future work: surface historic/withdrawn codes and tie minor-unit metadata to Money rounding utilities.
-- **Locale**: Implemented. Future work: fallback rules for private subtags and robust pluralization helpers.
+- What invalid states does the type prevent that a primitive cannot prevent reliably?
+- Are parsing, formatting, comparison, equality, and normalization rules deterministic and culture-safe?
+- Does the type preserve meaningful distinctions such as null versus empty, case sensitivity, precision, time zone, or leading zeros?
+- Are boundary values and failure modes explicit?
+- Can the type evolve without silently changing serialized or database representations?
 
-## Networking
-- **Url**: Implemented. Future work: safe redirect validation helpers and allow/disallow list enforcement.
-- **IpAddress / CidrRange**: Implemented. Future work: IPv6 abbreviation controls and multicast/private range helpers.
+## Integration expectations
 
-## Platform integration
-- **ConnectionString**: Structured representation that can redact secrets in logging and merge environment overrides.
-- **FeatureFlagKey**: Strongly-typed keys for configuration providers with slug/segment validation.
+- Provide consistent `Parse`, `TryParse`, formatting, JSON, `TypeConverter`, and EF Core guidance when those integrations apply.
+- Document canonical and display forms separately.
+- Avoid network lookups or mutable external catalogs in core parsing behavior.
+- Keep sensitive values redacted by default in logs and diagnostic output.
+- Add migration guidance before changing an existing representation or validation rule.
 
-Implementation guidance: model these with consistent parsing/formatting semantics, JSON and TypeConverter support, and EF Core `ValueConverter` samples similar to existing types.
+## Evidence expectations
+
+- Cover valid, invalid, edge, round-trip, and culture-sensitive cases.
+- Add serialization and persistence tests for public converters.
+- Use property, mutation, or fuzz testing for parser-heavy or boundary-heavy types when practical.
+- Record performance requirements before introducing caching, pooling, or custom allocation strategies.
