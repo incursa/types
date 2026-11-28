@@ -76,7 +76,7 @@ public readonly struct BigDecimal
             coefficient = -coefficient;
         }
 
-        int scale = (bits[3] >> 16) & 0x7F;
+        int scale = (bits[3] >> 16) & 0xFF;
         return new BigDecimal(coefficient, -scale);
     }
 
