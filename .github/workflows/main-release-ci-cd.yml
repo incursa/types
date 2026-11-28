@@ -91,7 +91,7 @@ jobs:
           bash scripts/ci/collect-test-metrics.sh "$trx_file" artifacts/ci-metrics/main-release/test.json "$GITHUB_OUTPUT"
 
       - name: Pack NuGet packages
-        run: dotnet pack Incursa.Types/Incursa.Types.csproj --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
+        run: dotnet pack Incursa.Core.slnx --configuration Release --output ./nupkgs -p:PackageVersion=${{ steps.git_version.outputs.semVer }}
 
       - name: Collect package metrics
         id: package_metrics
@@ -118,6 +118,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: ${{ !contains(github.ref_name, '-') }}
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
     outputs:
       publish_status: ${{ steps.publish_status.outputs.publish_status }}
       publish_target: ${{ steps.publish_status.outputs.publish_target }}
@@ -127,8 +131,13 @@ jobs:
         with:
           name: nupkgs
           path: out
+      - name: Request short-lived NuGet.org API key
+        id: nuget_login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841
+        with:
+          user: McAravey
       - name: Push to nuget.org
-        run: dotnet nuget push "out/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+        run: dotnet nuget push "out/*.nupkg" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
       - name: Export publish metrics
         id: publish_status
         if: always()
