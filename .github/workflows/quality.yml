@@ -145,6 +145,10 @@ jobs:
             -o artifacts/repro2 \
             --no-restore
 
+      - name: Verify Primitives package-only consumer
+        shell: pwsh
+        run: ./scripts/verify-primitives-package.ps1 -PackageDirectory artifacts/repro1
+
       - name: Compare nupkg contents (normalized, multi-package)
         id: compare
         shell: bash

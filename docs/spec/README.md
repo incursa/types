@@ -3,6 +3,7 @@ workbench:
   type: spec
   workItems:
     - TASK-0001
+    - TASK-0002
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/README.md"

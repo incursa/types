@@ -15,7 +15,16 @@ The current hardening release introduces **breaking behavioral changes** to impr
 ```bash
 # using dotnet CLI
 dotnet add package Incursa.Types
+
+# dependency-free foundational values and contracts only
+dotnet add package Incursa.Types.Primitives
 ```
+
+`Incursa.Types` references `Incursa.Types.Primitives`, so existing full-package
+consumers continue to receive `FastId`, `ShortCode`, `Maybe<T>`, `Percentage`,
+`Duration`, `Period`, and the backed-type interfaces. Their `Incursa` namespaces
+are unchanged. Libraries that need only this dependency-free foundation can
+reference `Incursa.Types.Primitives` directly.
 
 The library currently targets **.NET 8.0**. If your solution uses an earlier target, enable multi-targeting in your project file or add a `TargetFramework` compatible with .NET 8 when consuming the package locally.
 

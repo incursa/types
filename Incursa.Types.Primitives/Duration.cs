@@ -14,7 +14,6 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using CommunityToolkit.Diagnostics;
 
 namespace Incursa;
 /// <summary>
@@ -317,7 +316,7 @@ public readonly partial record struct Duration
 
         public override void Write(Utf8JsonWriter writer, Duration value, JsonSerializerOptions options)
         {
-            Guard.IsNotNull(writer);
+            ArgumentNullException.ThrowIfNull(writer);
 
             writer.WriteStringValue(value.ToString());
         }
