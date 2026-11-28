@@ -266,6 +266,33 @@ jobs:
           name: quality-verify-metrics
           path: artifacts/ci-metrics/quality
 
+  timezone_platform:
+    name: Timezone Platform (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Incursa.Core.slnx
+
+      - name: Run platform timezone matrix
+        run: dotnet test Incursa.Core.slnx --configuration Release --filter "FullyQualifiedName~TimeZoneId"
+
+      - name: Verify invariant-globalization failure contract
+        env:
+          DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 1
+        run: dotnet test Incursa.Core.slnx --configuration Release --filter "FullyQualifiedName~InvariantGlobalizationReportsUnavailablePlatformData"
+
   mutation:
     name: Mutation Testing (Stryker)
     runs-on: ubuntu-latest
@@ -363,7 +390,7 @@ jobs:
     name: Quality Report
     runs-on: ubuntu-latest
     if: always()
-    needs: [verify, mutation]
+    needs: [verify, timezone_platform, mutation]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -372,6 +399,7 @@ jobs:
         shell: bash
         env:
           VERIFY_RESULT: ${{ needs.verify.result }}
+          TIMEZONE_RESULT: ${{ needs.timezone_platform.result }}
           MUTATION_RESULT: ${{ needs.mutation.result }}
           TESTS_PASSED: ${{ needs.verify.outputs.tests_passed }}
           TESTS_FAILED: ${{ needs.verify.outputs.tests_failed }}
@@ -404,6 +432,9 @@ jobs:
           package_status="${PACKAGE_STATUS:-❌}"
           deterministic_status="${DETERMINISTIC_STATUS:-❌}"
 
+          timezone_status="❌"
+          if [[ "$TIMEZONE_RESULT" == "success" ]]; then timezone_status="✅"; fi
+
           mutation_status="⚠️"
           mutation_metric="not run"
           mutation_threshold=">= 35"
@@ -423,6 +454,7 @@ jobs:
           if [[ "$line_status" != "✅" || "$branch_status" != "✅" ]]; then overall="❌ Failed"; fi
           if [[ "$tests_status" != "✅" ]]; then overall="❌ Failed"; fi
           if [[ "$package_status" != "✅" || "$deterministic_status" != "✅" ]]; then overall="❌ Failed"; fi
+          if [[ "$TIMEZONE_RESULT" != "success" ]]; then overall="❌ Failed"; fi
           if [[ "$MUTATION_RESULT" == "failure" || "$mutation_status" == "❌" ]]; then overall="❌ Failed"; fi
 
           reporting_status="✅"
@@ -438,6 +470,7 @@ jobs:
           gate_rows+="| 📊 Coverage (Branch) | ${branch_status} | ${COVERAGE_BRANCH_PCT:-0}% | >= ${COVERAGE_BRANCH_THRESHOLD:-50}% | Line ${COVERAGE_LINE_PCT:-0}% |\n"
           gate_rows+="| 📦 Packaging | ${package_status} | ${PACKAGE_COUNT:-0} packages | >= 1 | ${PACKAGE_VERSIONS:-metrics missing} |\n"
           gate_rows+="| 📦 Determinism | ${deterministic_status} | normalized package compare | pass | reproducible pack check |\n"
+          gate_rows+="| 🌐 Timezone Platforms | ${timezone_status} | Windows + Linux + invariant mode | pass | ${TIMEZONE_RESULT} matrix |\n"
           gate_rows+="| 🧬 Mutation | ${mutation_status} | ${mutation_metric} | ${mutation_threshold} | ${mutation_notes} |\n"
           gate_rows+="| 📝 Reporting Metrics | ${reporting_status} | metric extraction | best-effort | ${reporting_notes} |"
 
