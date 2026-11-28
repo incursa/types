@@ -20,6 +20,8 @@ public sealed class PrimitivePackageBoundaryTests
 {
     private static readonly Type[] PrimitiveTypes =
     [
+        typeof(BigDecimal),
+        typeof(BigDecimalProfile),
         typeof(Duration),
         typeof(FastId),
         typeof(Maybe<>),
@@ -58,6 +60,14 @@ public sealed class PrimitivePackageBoundaryTests
         Type? resolvedType = Type.GetType("Incursa.Money, Incursa.Types", throwOnError: true);
 
         resolvedType.ShouldBe(typeof(Money));
+    }
+
+    [Fact]
+    public void AssemblyQualifiedBigDecimalIdentityResolvesThroughRichPackageForwarder()
+    {
+        Type? resolvedType = Type.GetType("Incursa.BigDecimal, Incursa.Types", throwOnError: true);
+
+        resolvedType.ShouldBe(typeof(BigDecimal));
     }
 
     [Fact]

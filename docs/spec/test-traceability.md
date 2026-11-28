@@ -48,6 +48,18 @@ This file maps behavioral specification clauses to concrete tests.
 | FASTID-PARSE-INVALID-001 | `docs/spec/types/FastId.md` / Parse/TryParse | `Incursa.Types.Tests.SpecDrivenCoreTypesTests.FastId_TryParse_InvalidCharacter_ReturnsFalse` | Implemented |
 | FASTID-CONVERT-001 | `docs/spec/types/FastId.md` / Converters/Serialization | `Incursa.Types.Tests.SpecDrivenCoreTypesTests.FastId_JsonConverter_RoundTripsEncodedValue` | Implemented |
 
+## BigDecimal exact core
+
+| SPEC-ID | Spec Location | Test | Status |
+| --- | --- | --- | --- |
+| BIGDECIMAL-MODEL-001 | `docs/spec/types/BigDecimal.md` / Canonical value model | `Incursa.Types.Tests.BigDecimalCoreTests.Parse_NormalizesPythonGeneratedCoreVectors`; `EquivalentSpellings_HaveEqualIdentityAndHash` | Implemented |
+| BIGDECIMAL-PARSE-001 | `docs/spec/types/BigDecimal.md` / Input contract | `Incursa.Types.Tests.BigDecimalCoreTests.Parse_NormalizesPythonGeneratedCoreVectors`; `ParseRejectsMalformedOrSpecialValues` | Implemented |
+| BIGDECIMAL-LIMIT-001 | `docs/spec/types/BigDecimal.md` / Profiles and bounds | `Incursa.Types.Tests.BigDecimalCoreTests.ParseRejectsOversizedInputBeforeConstruction`; `ProfileRejectsNormalizedCoefficientAndExponentOutsideEnvelope`; `ConstructorDetectsExponentOverflowDuringNormalization` | Implemented |
+| BIGDECIMAL-IDENTITY-001 | `docs/spec/types/BigDecimal.md` / Canonical value model | `Incursa.Types.Tests.BigDecimalCoreTests.EquivalentSpellings_HaveEqualIdentityAndHash`; `CompareTo_OrdersWithoutNativeOrPowerOfTenConversion` | Implemented |
+| BIGDECIMAL-CONVERT-001 | `docs/spec/types/BigDecimal.md` / Exact native conversions | `Incursa.Types.Tests.BigDecimalCoreTests.Decimal_RoundTripsExactly`; `Int32_ExactConversionAcceptsOnlyExactRange`; `Int32_ExactConversionRejectsFractionAndRangeLoss`; `Decimal_ExactConversionMatchesNativeBoundary`; `Decimal_ExactConversionRejectsPrecisionOrRangeLoss` | Implemented |
+| BIGDECIMAL-SQL-001 | `docs/spec/types/BigDecimal.md` / Profiles and bounds | `Incursa.Types.Tests.BigDecimalCoreTests.Decimal38_ProfileAcceptsMandatorySqlDomain` | Implemented |
+| BIGDECIMAL-EVIDENCE-001 | `docs/spec/types/BigDecimal.md` / Requirement and test scenarios | `Incursa.Types.Tests.BigDecimalCoreTests.Parse_NormalizesPythonGeneratedCoreVectors`; `scripts/verify-bigdecimal-core-vectors.py` | Implemented; independent verifier requires Python |
+
 ## Supporting Types
 
 | SPEC-ID | Spec Location | Test | Status |

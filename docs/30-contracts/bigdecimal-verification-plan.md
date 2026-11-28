@@ -3,6 +3,7 @@ workbench:
   type: spec
   workItems:
     - TASK-0005
+    - TASK-0006
   codeRefs: []
   path: /docs/30-contracts/bigdecimal-verification-plan.md
   pathHistory:

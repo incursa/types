@@ -1,0 +1,10 @@
+{"input":"0","coefficient":"0","exponent":0,"canonical":"0"}
+{"input":"-0.000e99","coefficient":"0","exponent":0,"canonical":"0"}
+{"input":"1","coefficient":"1","exponent":0,"canonical":"1e0"}
+{"input":"+001.2300","coefficient":"123","exponent":-2,"canonical":"123e-2"}
+{"input":"-987654321.012300","coefficient":"-9876543210123","exponent":-4,"canonical":"-9876543210123e-4"}
+{"input":"123e4","coefficient":"123","exponent":4,"canonical":"123e4"}
+{"input":"1000e-5","coefficient":"1","exponent":-2,"canonical":"1e-2"}
+{"input":"99999999999999999999999999999999999999","coefficient":"99999999999999999999999999999999999999","exponent":0,"canonical":"99999999999999999999999999999999999999e0"}
+{"input":"0.00000000000000000000000000000000000001","coefficient":"1","exponent":-38,"canonical":"1e-38"}
+{"input":"-79228162514264337593543950335","coefficient":"-79228162514264337593543950335","exponent":0,"canonical":"-79228162514264337593543950335e0"}

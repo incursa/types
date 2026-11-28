@@ -15,6 +15,8 @@
 using System.Runtime.CompilerServices;
 
 [assembly: TypeForwardedTo(typeof(Incursa.Duration))]
+[assembly: TypeForwardedTo(typeof(Incursa.BigDecimal))]
+[assembly: TypeForwardedTo(typeof(Incursa.BigDecimalProfile))]
 [assembly: TypeForwardedTo(typeof(Incursa.FastId))]
 [assembly: TypeForwardedTo(typeof(Incursa.IBvParsable<>))]
 [assembly: TypeForwardedTo(typeof(Incursa.IDecimalBackedType<>))]
