@@ -4,6 +4,7 @@ workbench:
   workItems:
     - TASK-0001
     - TASK-0002
+    - TASK-0004
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/compat-decisions.md"
@@ -78,3 +79,29 @@ Case-by-case decisions when desired behavior differs from current behavior.
 - Required actions:
   - add a deterministic generation-policy helper and tests
   - document the generation-only compatibility boundary
+
+### DEC-005: Time-zone mapping follows supported platform ICU/CLDR data
+- Date: 2026-11-27
+- Type: `TimeZoneId`
+- Prior behavior: TimeZoneConverter supplied a bundled Windows/IANA mapping
+  snapshot and could fall back to a resolved platform identifier when an IANA
+  canonical mapping was unavailable.
+- New behavior: .NET `TimeZoneInfo` performs lookup and Windows/IANA conversion;
+  missing conversion data fails with `PlatformNotSupportedException`, corrupt
+  host data remains `InvalidTimeZoneException`, and no host-local or unmapped
+  identifier is silently substituted.
+- Decision: **Approved for TY-04 implementation; SpecAttest requirements remain draft**
+- Rationale:
+  - removes the third-party runtime dependency using supported .NET 8 APIs
+  - preserves common Windows, IANA, UTC, and alias behavior on supported hosts
+  - makes invariant/NLS-only/globalization limitations visible to callers
+  - lets platform servicing update ICU/CLDR mapping data
+- Migration impact:
+  - a mapping changed by the host ICU/CLDR version can produce the platform's
+    current canonical IANA identifier rather than the old bundled snapshot
+  - unsupported hosts now receive an actionable exception instead of a fallback
+    identifier
+- Required actions:
+  - run Windows and Linux ID/alias/invalid-ID tests
+  - run an invariant-globalization failure-contract test
+  - retain the rich-package boundary and .NET 8 target

@@ -3,6 +3,7 @@ workbench:
   type: spec
   workItems:
     - TASK-0003
+    - TASK-0004
   codeRefs: []
   pathHistory:
     - "C:/docs/migration-v2.md"
@@ -27,6 +28,7 @@ If you are upgrading from earlier versions, review the changes below and update 
 | `Money` normalization | Fractional normalization truncated excess precision | Values normalize with banker's rounding (`MidpointRounding.ToEven`) to 2 decimals | Rebaseline midpoint-sensitive financial assertions (for example `1.005`, `1.015`) |
 | `Money.ToWords()` | Humanizer with hard-coded plural labels; negative sub-dollar values lost their sign/cents; values beyond `long` failed | Dependency-free deterministic English grammar with singular/plural labels, exact negative cents, and full `decimal` range through octillion | Rebaseline word snapshots for singular, negative sub-dollar, or very large amounts |
 | `MonthOnly` namespace | `Incursa.Types` | `Incursa` | Update imports/usings |
+| `TimeZoneId` mapping source | TimeZoneConverter bundled Windows/IANA mapping data | .NET 8 `TimeZoneInfo` with host ICU/CLDR or Windows data | Ensure supported hosts provide ICU conversion data; handle `PlatformNotSupportedException` explicitly |
 
 ## Behavioral hardening
 
@@ -58,6 +60,12 @@ emits a cents phrase only for non-zero normalized cents:
 new Money(1.01m).ToWords();  // "one dollar and one cent"
 new Money(-0.01m).ToWords(); // "minus zero dollars and one cent"
 ```
+
+`TimeZoneId` no longer brings in TimeZoneConverter. Common Windows IDs continue
+to canonicalize to IANA, while IANA aliases preserve the accepted input text.
+Invariant globalization or Windows NLS-only environments that cannot perform
+the required conversion now fail explicitly instead of substituting a local or
+unmapped identifier.
 
 ## Upgrade checklist
 

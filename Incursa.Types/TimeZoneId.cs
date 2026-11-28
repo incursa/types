@@ -14,7 +14,7 @@
 
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using TimeZoneConverter;
+using System.Security;
 
 #nullable enable
 
@@ -74,7 +74,11 @@ public readonly record struct TimeZoneId : IParsable<TimeZoneId>
     {
         try
         {
-            return TZConvert.GetTimeZoneInfo(id);
+            return TimeZoneInfo.FindSystemTimeZoneById(id);
+        }
+        catch (TimeZoneNotFoundException ex) when (RequiresUnavailableIanaData(id))
+        {
+            throw CreatePlatformDataException(id, ex);
         }
         catch (TimeZoneNotFoundException ex)
         {
@@ -82,29 +86,48 @@ public readonly record struct TimeZoneId : IParsable<TimeZoneId>
         }
         catch (InvalidTimeZoneException ex)
         {
-            throw new ArgumentException($"Invalid time zone identifier '{id}'.", nameof(id), ex);
+            throw new InvalidTimeZoneException($"System time zone data for '{id}' is invalid.", ex);
+        }
+        catch (SecurityException ex)
+        {
+            throw new PlatformNotSupportedException($"System time zone data for '{id}' is not accessible on this host.", ex);
         }
     }
 
     private static string NormalizeIdentifier(string originalId, TimeZoneInfo info)
     {
-        if (TZConvert.KnownWindowsTimeZoneIds.Contains(originalId, StringComparer.OrdinalIgnoreCase))
+        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(originalId, out string? ianaId))
         {
-            return TZConvert.WindowsToIana(originalId);
+            return ianaId;
         }
 
-        if (TZConvert.KnownIanaTimeZoneNames.Contains(originalId, StringComparer.OrdinalIgnoreCase))
+        if (info.HasIanaId)
         {
             return originalId;
         }
 
-        if (TZConvert.TryWindowsToIana(info.Id, out string? iana))
+        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(info.Id, out ianaId))
         {
-            return iana;
+            return ianaId;
         }
 
-        return info.Id;
+        throw CreatePlatformDataException(originalId);
     }
+
+    private static bool RequiresUnavailableIanaData(string id) =>
+        !HasIanaConversionData() &&
+        (id.Contains('/', StringComparison.Ordinal) ||
+         id.Contains(' ', StringComparison.Ordinal) ||
+         string.Equals(id, "UTC", StringComparison.OrdinalIgnoreCase));
+
+    private static bool HasIanaConversionData() =>
+        TimeZoneInfo.TryConvertWindowsIdToIanaId("UTC", out _);
+
+    private static PlatformNotSupportedException CreatePlatformDataException(string id, Exception? innerException = null) =>
+        new(
+            $"Time zone identifier '{id}' requires ICU/CLDR conversion data that is unavailable on this host. " +
+            "Enable ICU globalization data and disable invariant or Windows NLS-only globalization modes.",
+            innerException);
 
     public class TimeZoneIdTypeConverter : TypeConverter
     {

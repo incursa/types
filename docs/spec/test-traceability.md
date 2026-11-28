@@ -5,6 +5,7 @@ workbench:
     - TASK-0001
     - TASK-0002
     - TASK-0003
+    - TASK-0004
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/test-traceability.md"
@@ -93,6 +94,9 @@ This file maps behavioral specification clauses to concrete tests.
 | TIMEZONEID-CONSTRUCT-001 | `docs/spec/types/TimeZoneId.md` / Construction | `Incursa.Types.Tests.SpecDrivenWaveOneHardeningTests.TimeZoneId_Parse_And_Converters_ResolveCanonicalIdentifier` | Implemented |
 | TIMEZONEID-FORMAT-001 | `docs/spec/types/TimeZoneId.md` / Formatting/ToString | `Incursa.Types.Tests.SpecDrivenWaveOneHardeningTests.TimeZoneId_Parse_And_Converters_ResolveCanonicalIdentifier` | Implemented |
 | TIMEZONEID-CONVERT-001 | `docs/spec/types/TimeZoneId.md` / Converters/Serialization | `Incursa.Types.Tests.SpecDrivenWaveOneHardeningTests.TimeZoneId_Parse_And_Converters_ResolveCanonicalIdentifier`; `Incursa.Types.Tests.SpecDrivenSupportingTypesTests.TimeZoneId_TypeConverter_UnsupportedDestination_Throws` | Implemented |
+| TIMEZONEID-PLATFORM-001 | `docs/spec/types/TimeZoneId.md` / Normalization Rules | `Incursa.Types.Tests.TimeZoneIdPlatformTests.WindowsIdentifiersCanonicalizeToIana`; `IanaIdentifiersAndAliasesPreserveAcceptedInput` | Implemented; Windows/Linux CI matrix |
+| TIMEZONEID-PLATFORM-002 | `docs/spec/types/TimeZoneId.md` / Error Contracts | `Incursa.Types.Tests.TimeZoneIdPlatformTests.InvalidIdentifierFailsWithoutSubstitutingHostZone` | Implemented; Windows/Linux CI matrix |
+| TIMEZONEID-PLATFORM-003 | `docs/spec/types/TimeZoneId.md` / Error Contracts | `Incursa.Types.Tests.TimeZoneIdPlatformTests.InvariantGlobalizationReportsUnavailablePlatformData` | Implemented; invariant-mode CI process |
 | URL-CONSTRUCT-001 | `docs/spec/types/Url.md` / Construction | `Incursa.Types.Tests.NewValueObjectsTests.Url_Normalizes_Host_And_Default_Port` | Implemented |
 | URL-PARSE-001 | `docs/spec/types/Url.md` / Parse/TryParse | `Incursa.Types.Tests.SpecDrivenWaveOneHardeningTests.Url_Normalization_And_Converters_AreDeterministic` | Implemented |
 | URL-TRYPARSE-001 | `docs/spec/types/Url.md` / Parse/TryParse | `Incursa.Types.Tests.SpecDrivenSupportingTypesTests.Url_TryParse_RelativeUrl_IsNotAbsolute` | Implemented |
