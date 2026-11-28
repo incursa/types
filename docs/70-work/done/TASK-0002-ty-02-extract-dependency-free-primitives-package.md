@@ -1,7 +1,7 @@
 ---
 id: TASK-0002
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -14,7 +14,8 @@ related:
     - /docs/spec/test-traceability.md
   adrs: []
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/5"
   issues: []
   branches:
     - users/samuelmcaravey/ty-02-primitives-extraction
