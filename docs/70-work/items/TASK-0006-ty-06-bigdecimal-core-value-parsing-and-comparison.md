@@ -14,7 +14,8 @@ related:
   adrs:
     - /docs/40-decisions/ADR-0001-bigdecimal-exact-decimal-model.md
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/9"
   issues: []
   branches:
     - users/samuelmcaravey/ty-06-bigdecimal-core
