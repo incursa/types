@@ -290,7 +290,7 @@ jobs:
         run: dotnet restore Incursa.Core.slnx
 
       - name: Install Stryker
-        run: dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
+        run: dotnet tool install --tool-path .tools dotnet-stryker --version 4.16.0
 
       - name: Run mutation tests
         id: stryker
