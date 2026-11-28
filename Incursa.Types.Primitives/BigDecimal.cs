@@ -21,7 +21,7 @@ namespace Incursa;
 /// Represents an exact finite decimal as a normalized integer coefficient
 /// multiplied by ten raised to an integral exponent.
 /// </summary>
-public readonly struct BigDecimal
+public readonly partial struct BigDecimal
     : IComparable,
       IComparable<BigDecimal>,
       IEquatable<BigDecimal>,

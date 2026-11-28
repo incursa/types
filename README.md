@@ -42,6 +42,9 @@ Console.WriteLine(total.ToAccounting()); // $13.35
 // Exact finite decimal identity (coefficient × 10^exponent)
 var exact = BigDecimal.Parse("12345678901234567890.0100");
 Console.WriteLine(exact); // 1234567890123456789001e-2
+var eighth = BigDecimal.One.DivideRounded(
+    BigDecimal.Parse("8"), 2, BigDecimalRoundingMode.ToNearestTiesToEven);
+Console.WriteLine(eighth); // 12e-2
 
 // FastId deterministic identifier
 record Order(FastId Id);
@@ -97,7 +100,7 @@ dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
 * **FastId** – Snowflake-like, time-sortable identifier with deterministic GUID/string conversion helpers.
 * **Money** – Banker-rounded two-decimal monetary amounts with accounting/number formatting helpers.
 * **Percentage** – Percentage value object that truncates to two decimal places and supports arithmetic.
-* **BigDecimal** – dependency-free exact finite decimal with bounded invariant parsing, canonical identity, named precision profiles, and exact native conversions.
+* **BigDecimal** – dependency-free exact finite decimal with bounded parsing, canonical identity, named profiles, checked exact arithmetic, explicit rounding, and exact native conversions.
 * **Duration** – ISO 8601 duration parser/formatter; supports fractional units and date arithmetic.
 * **Period** – ISO 8601 time interval composed of a start and `Duration`; uses half-open semantics `[start, end)`.
 * **RecurringPeriod** – Cron expression wrapper that materializes deterministic `Period` windows from the provided reference time.

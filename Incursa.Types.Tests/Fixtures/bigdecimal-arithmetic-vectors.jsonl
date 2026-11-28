@@ -1,0 +1,5 @@
+{"left":"12.5","right":"2.5","add":"15e0","subtract":"1e1","multiply":"3125e-2","divide":"5e0","remainder":"0"}
+{"left":"1","right":"8","add":"9e0","subtract":"-7e0","multiply":"8e0","divide":"125e-3","remainder":"1e0"}
+{"left":"-7.5","right":"2","add":"-55e-1","subtract":"-95e-1","multiply":"-15e0","divide":"-375e-2","remainder":"-15e-1"}
+{"left":"123e4","right":"3e2","add":"12303e2","subtract":"12297e2","multiply":"369e6","divide":"41e2","remainder":"0"}
+{"left":"0.000125","right":"0.025","add":"25125e-6","subtract":"-24875e-6","multiply":"3125e-9","divide":"5e-3","remainder":"125e-6"}

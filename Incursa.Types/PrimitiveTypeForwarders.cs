@@ -16,7 +16,11 @@ using System.Runtime.CompilerServices;
 
 [assembly: TypeForwardedTo(typeof(Incursa.Duration))]
 [assembly: TypeForwardedTo(typeof(Incursa.BigDecimal))]
+[assembly: TypeForwardedTo(typeof(Incursa.BigDecimalContext))]
+[assembly: TypeForwardedTo(typeof(Incursa.BigDecimalLimitException))]
+[assembly: TypeForwardedTo(typeof(Incursa.BigDecimalNonTerminatingDivisionException))]
 [assembly: TypeForwardedTo(typeof(Incursa.BigDecimalProfile))]
+[assembly: TypeForwardedTo(typeof(Incursa.BigDecimalRoundingMode))]
 [assembly: TypeForwardedTo(typeof(Incursa.FastId))]
 [assembly: TypeForwardedTo(typeof(Incursa.IBvParsable<>))]
 [assembly: TypeForwardedTo(typeof(Incursa.IDecimalBackedType<>))]

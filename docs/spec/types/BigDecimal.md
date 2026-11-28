@@ -3,6 +3,7 @@ workbench:
   type: spec
   workItems:
     - TASK-0006
+    - TASK-0007
   codeRefs:
     - Incursa.Types.Primitives/BigDecimal.cs
     - Incursa.Types.Primitives/BigDecimalProfile.cs
@@ -91,6 +92,43 @@ ambient precision setting exists.
 - TY-06 provides no implicit binary floating, rounded, truncating, or
   saturating conversion API.
 
+### Exact arithmetic and remainder
+
+- `+`, `-`, `*`, `/`, and `%` use the stable immutable
+  `BigDecimalContext.Default`; named methods accept an explicit context.
+- Addition, subtraction, and multiplication return the exact mathematical
+  result or `BigDecimalLimitException` when the selected profile cannot admit
+  an operand, working value, allocation estimate, exponent, or result.
+- Exact division reduces the coefficient fraction. A denominator containing
+  factors other than 2 and 5 throws
+  `BigDecimalNonTerminatingDivisionException`; a zero divisor throws
+  `DivideByZeroException`.
+- Remainder uses a quotient truncated toward zero and returns the exact
+  residual. Its sign follows the dividend when nonzero.
+
+### Explicit rounding
+
+- `DivideRounded` requires a target scale and `BigDecimalRoundingMode`.
+- `Quantize` requires the same explicit target and policy.
+- Modes are toward zero, away from zero, toward positive infinity, toward
+  negative infinity, nearest ties-to-even, and nearest ties-away-from-zero.
+- Scale belongs to the operation/schema, not intrinsic identity; a rounded
+  result is normalized after the requested scale has been enforced.
+
+### Generic math compatibility
+
+- Exact arithmetic, comparison, parsing, and formatting members use the
+  standard operators/interfaces where their contracts preserve these
+  semantics.
+- TY-07 deliberately does not implement `INumber<BigDecimal>`. That aggregate
+  interface requires a much broader generic conversion and numeric-function
+  surface, including truncating/saturating creation policies, whose complete
+  conformance has not been qualified. Implementing it partially would create
+  misleading generic compatibility.
+- No operator or conversion silently substitutes rounded arithmetic. Lossy
+  behavior remains available only through separately named APIs with explicit
+  policy.
+
 ## Compatibility and dependency boundary
 
 - `BigDecimal` and `BigDecimalProfile` live in the dependency-free
@@ -109,3 +147,8 @@ ambient precision setting exists.
 - `BIGDECIMAL-SQL-001`: Decimal38 boundaries agree with `SqlDecimal`.
 - `BIGDECIMAL-EVIDENCE-001`: independently generated JSONL vectors agree with
   the implementation.
+- `BIGDECIMAL-ARITHMETIC-001`: exact add/subtract/multiply and classified limits.
+- `BIGDECIMAL-DIVIDE-001`: terminating exact division, nontermination, and zero.
+- `BIGDECIMAL-REMAINDER-001`: truncated-toward-zero exact residual.
+- `BIGDECIMAL-ROUND-001`: scale plus six explicit rounding modes and ties.
+- `BIGDECIMAL-CONTEXT-001`: immutable non-ambient operation context.

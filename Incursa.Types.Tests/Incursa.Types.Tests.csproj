@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <None Update="Fixtures\bigdecimal-core-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures\bigdecimal-arithmetic-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
