@@ -15,7 +15,8 @@ related:
     - /docs/spec/test-traceability.md
   adrs: []
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/12"
   issues: []
   branches:
     - users/samuelmcaravey/ty-09-calendar-duration-period
