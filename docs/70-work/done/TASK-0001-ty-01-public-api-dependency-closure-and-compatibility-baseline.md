@@ -66,8 +66,7 @@ not promote requirements or claim that deferred requirements are implemented.
   Re-running the built test assembly with `DOTNET_ROLL_FORWARD=Major` passed
   252/252 tests (0 failed, 0 skipped) on the installed newer runtime. A separate
   isolated TY-01 worker run attached to ClickUp passed the same 252 tests on
-  .NET 8.0.34 at this exact commit. The local restore also reported NU1902 for
-  `MimeKit` 4.14.0; dependency remediation is outside this inventory task.
+  .NET 8.0.34 at this exact commit.
 
 The generated `Incursa.Types.1.0.0.nupkg` contains the net8.0 assembly, README,
 and icon. Its consumer runtime dependency group is:
@@ -77,7 +76,7 @@ and icon. Its consumer runtime dependency group is:
 | CommunityToolkit.Diagnostics | 8.4.0 | Guard calls in file, temporal, contact, encrypted-string, and state types |
 | Cronos | 0.11.1 | `RecurringPeriod` public API and parsing |
 | Humanizer.Core | 3.0.1 | `Money.ToWords` |
-| MimeKit | 4.14.0 | MIME inference and email parsing |
+| MimeKit | 4.14.0 at baseline; 4.18.2 in this PR | MIME inference and email parsing |
 | System.Memory.Data | 10.0.0 | `BinaryData` in `BvFile`/`IFile` |
 | TimeZoneConverter | 7.0.0 | `TimeZoneId` Windows/IANA conversion |
 | libphonenumber-csharp | 9.0.21 | `PhoneNumber` parsing and E.164 formatting |
@@ -86,6 +85,23 @@ Build-only analyzer/generator dependencies remain private and are not listed in
 the package runtime group. The resolved repository build graph also includes
 transitive packages, notably BouncyCastle via MimeKit and FluentValidation via
 the generator package; package-only runtime verification belongs to TY-10.
+
+## CI prerequisite corrections
+
+Opening the inventory PR exposed three pre-existing gate failures that prevented
+the repository from accepting any normal work-item change. This PR applies the
+smallest corrections needed to make the mandated workflow usable:
+
+- Restores the standard strict `docs/30-contracts/work-item.schema.json` used by
+  sibling Incursa repositories, allowing Workbench to validate work items.
+- Updates `scripts/verify-type-specs.ps1` to ignore Workbench YAML front matter
+  when validating the existing behavioral-specification body contract.
+- Normalizes `AclKeyTests.cs` to the repository-required UTF-8 BOM and advances
+  MimeKit within the compatible 4.x line from vulnerable 4.14.0 to 4.18.2.
+
+After these corrections the exact formatter and deterministic `-warnaserror`
+build pass with zero warnings/errors. The coverage-gated run passes 252/252
+tests with 73.16% line and 59.83% branch coverage, above the 65%/50% gates.
 
 ## Type ownership and behavioral contracts
 
