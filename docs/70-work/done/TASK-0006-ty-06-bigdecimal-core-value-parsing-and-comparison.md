@@ -1,7 +1,7 @@
 ---
 id: TASK-0006
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -69,7 +69,11 @@ promoting requirement lifecycle state.
   `Incursa.Types.Primitives` nupkg with `BigDecimal`, with zero runtime package
   dependencies.
 - Workbench strict validation, type-spec structural verification, formatting,
-  analyzers, and diff checks pass. Connected CI remains to be recorded.
+  analyzers, and diff checks pass.
+- PR #9 connected validation passed Workbench, Windows/Ubuntu timezone
+  regression, warn-as-error build, 341 tests, coverage gates, package-only
+  consumer, deterministic packaging, both mutation scopes, and aggregate
+  Quality Report.
 
 ## Acceptance criteria
 
@@ -77,5 +81,5 @@ promoting requirement lifecycle state.
   oversized input, equality/hash, comparison, and exact conversions pass.
 - [x] Dependency-free package API and independently authored vectors are
   verified, with no runtime dependency added.
-- [ ] Requirements map to code/tests or explicit deferral and Release solution
+- [x] Requirements map to code/tests or explicit deferral and Release solution
   tests plus connected CI are recorded.
