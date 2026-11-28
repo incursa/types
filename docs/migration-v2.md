@@ -4,6 +4,7 @@ workbench:
   workItems:
     - TASK-0003
     - TASK-0004
+    - TASK-0009
   codeRefs: []
   pathHistory:
     - "C:/docs/migration-v2.md"
@@ -66,6 +67,24 @@ to canonicalize to IANA, while IANA aliases preserve the accepted input text.
 Invariant globalization or Windows NLS-only environments that cannot perform
 the required conversion now fail explicitly instead of substituting a local or
 unmapped identifier.
+
+## Strict calendar duration and exact period adoption
+
+The existing `Duration` and `Period` types remain available without TY-09
+semantic or wire changes. New code that needs exact arithmetic and explicit DST
+behavior can opt into `CalendarDuration` and `ExactPeriod`.
+
+| Compatibility dimension | Legacy types | Strict types / migration action |
+| --- | --- | --- |
+| Source | Existing `Duration` and `Period` names and members remain. | Change the declared type and construction/parsing calls explicitly. |
+| Binary | Existing types remain defined in `Incursa.Types.Primitives` and forwarded through `Incursa.Types`. | New strict types are also forwarded; recompile to consume their APIs. |
+| Behavior | Legacy floating calendar arithmetic and `Period` behavior are unchanged by TY-09. | Use integral months/days, exact elapsed units, and explicit `LocalTimeResolution`. |
+| Wire | Existing duration and start/duration period strings remain unchanged. | `CalendarDuration` has one-sign normalized text; `ExactPeriod` uses two fixed offset endpoints. Version schemas/messages before changing stored or exchanged fields. |
+
+Do not deserialize a legacy field directly as a strict type. Parse the old type,
+apply an application-owned conversion policy, then write the new canonical
+field under a versioned schema. Fractional years/months/days require an explicit
+business decision because the strict profile does not approximate them.
 
 ## Upgrade checklist
 

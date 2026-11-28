@@ -15,6 +15,8 @@
 using System.Runtime.CompilerServices;
 
 [assembly: TypeForwardedTo(typeof(Incursa.Duration))]
+[assembly: TypeForwardedTo(typeof(Incursa.CalendarDuration))]
+[assembly: TypeForwardedTo(typeof(Incursa.CalendarDurationJsonConverter))]
 [assembly: TypeForwardedTo(typeof(Incursa.ElapsedDuration))]
 [assembly: TypeForwardedTo(typeof(Incursa.ElapsedDurationJsonConverter))]
 [assembly: TypeForwardedTo(typeof(Incursa.BigDecimal))]
@@ -55,8 +57,11 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(Incursa.Maybe<>))]
 [assembly: TypeForwardedTo(typeof(Incursa.LocalDateTime))]
 [assembly: TypeForwardedTo(typeof(Incursa.LocalDateTimeJsonConverter))]
+[assembly: TypeForwardedTo(typeof(Incursa.LocalTimeResolution))]
 [assembly: TypeForwardedTo(typeof(Incursa.Money))]
 [assembly: TypeForwardedTo(typeof(Incursa.MoneyExtensions))]
 [assembly: TypeForwardedTo(typeof(Incursa.Percentage))]
 [assembly: TypeForwardedTo(typeof(Incursa.Period))]
+[assembly: TypeForwardedTo(typeof(Incursa.ExactPeriod))]
+[assembly: TypeForwardedTo(typeof(Incursa.ExactPeriodJsonConverter))]
 [assembly: TypeForwardedTo(typeof(Incursa.ShortCode))]

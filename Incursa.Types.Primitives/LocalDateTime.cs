@@ -139,6 +139,58 @@ public readonly record struct LocalDateTime
         return new DateTimeOffset(Value, timeZone.GetUtcOffset(Value));
     }
 
+    /// <summary>
+    /// Resolves these fields using an explicit ambiguity or gap policy.
+    /// </summary>
+    public DateTimeOffset InTimeZone(
+        TimeZoneInfo timeZone,
+        LocalTimeResolution resolution)
+    {
+        ArgumentNullException.ThrowIfNull(timeZone);
+        if (!Enum.IsDefined(resolution))
+        {
+            throw new ArgumentOutOfRangeException(nameof(resolution));
+        }
+
+        if (timeZone.IsAmbiguousTime(Value))
+        {
+            TimeSpan[] offsets = timeZone.GetAmbiguousTimeOffsets(Value);
+            TimeSpan offset = resolution switch
+            {
+                LocalTimeResolution.EarlierInstant => offsets.Max(),
+                LocalTimeResolution.LaterInstant => offsets.Min(),
+                LocalTimeResolution.Reject => throw CreateAmbiguousException(timeZone),
+                _ => throw new ArgumentException(
+                    "Ambiguous local times require EarlierInstant or LaterInstant resolution.",
+                    nameof(resolution)),
+            };
+            return new DateTimeOffset(Value, offset);
+        }
+
+        if (timeZone.IsInvalidTime(Value))
+        {
+            if (resolution == LocalTimeResolution.Reject)
+            {
+                throw CreateInvalidException(timeZone);
+            }
+
+            if (resolution is not LocalTimeResolution.ShiftForward and not LocalTimeResolution.ShiftBackward)
+            {
+                throw new ArgumentException(
+                    "Nonexistent local times require ShiftForward or ShiftBackward resolution.",
+                    nameof(resolution));
+            }
+
+            TimeSpan gap = FindInvalidTimeGap(timeZone);
+            DateTime shifted = resolution == LocalTimeResolution.ShiftForward
+                ? Value.Add(gap)
+                : Value.Subtract(gap);
+            return new LocalDateTime(shifted).InTimeZone(timeZone);
+        }
+
+        return new DateTimeOffset(Value, timeZone.GetUtcOffset(Value));
+    }
+
     /// <summary>Parses canonical local date-time text.</summary>
     public static LocalDateTime Parse(string s)
     {
@@ -272,6 +324,36 @@ public readonly record struct LocalDateTime
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(subsecondTicks, TimeSpan.TicksPerSecond);
         return subsecondTicks;
     }
+
+    private TimeSpan FindInvalidTimeGap(TimeZoneInfo timeZone)
+    {
+        DateTime before = Value;
+        DateTime after = Value;
+        for (int minutes = 0; minutes < 24 * 60; minutes++)
+        {
+            before = before.AddMinutes(-1);
+            after = after.AddMinutes(1);
+            if (!timeZone.IsInvalidTime(before) && !timeZone.IsInvalidTime(after))
+            {
+                TimeSpan gap = timeZone.GetUtcOffset(after) - timeZone.GetUtcOffset(before);
+                if (gap > TimeSpan.Zero)
+                {
+                    return gap;
+                }
+
+                break;
+            }
+        }
+
+        throw new InvalidTimeZoneException(
+            $"Unable to determine the transition gap for local time {this} in '{timeZone.Id}'.");
+    }
+
+    private ArgumentException CreateAmbiguousException(TimeZoneInfo timeZone) =>
+        new($"Local time {this} is ambiguous in time zone '{timeZone.Id}'.", nameof(timeZone));
+
+    private ArgumentException CreateInvalidException(TimeZoneInfo timeZone) =>
+        new($"Local time {this} does not exist in time zone '{timeZone.Id}'.", nameof(timeZone));
 }
 
 /// <summary>Serializes LocalDateTime as canonical zone-free text.</summary>
