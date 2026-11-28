@@ -18,6 +18,11 @@ Review migration guidance before upgrading:
 dotnet add package Incursa.Types
 ```
 
+This package restores `Incursa.Types.Primitives` transitively. Libraries that
+need only dependency-free foundational values may reference that package
+directly. Moved types retain the `Incursa` namespace and are forwarded through
+this assembly for compiled-consumer compatibility.
+
 ## Highlights
 
 - Time-sortable identifiers (`FastId`)

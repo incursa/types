@@ -5,6 +5,7 @@ workbench:
     - TASK-0001
     - TASK-0002
     - TASK-0004
+    - TASK-0010
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/compat-decisions.md"
@@ -105,3 +106,25 @@ Case-by-case decisions when desired behavior differs from current behavior.
   - run Windows and Linux ID/alias/invalid-ID tests
   - run an invariant-globalization failure-contract test
   - retain the rich-package boundary and .NET 8 target
+
+### DEC-006: Preserve pre-split identities through package type forwarding
+
+- Date: 2026-11-27
+- Area: `Incursa.Types` / `Incursa.Types.Primitives`
+- Prior behavior: all public types were defined by the single rich assembly.
+- New behavior: dependency-free foundational types are defined once by
+  Primitives and forwarded by Types; the public namespace remains `Incursa`.
+- Decision: **Approved for package qualification; publication remains separate**
+- Rationale:
+  - lets low-level libraries consume the foundation without rich runtime
+    dependencies
+  - preserves source names and old compiled assembly-qualified references
+  - prevents duplicate type identity in combined package graphs
+- Migration impact:
+  - deployments must restore and deploy the new transitive Primitives assembly
+  - consumers referencing Types require no package-reference change
+  - direct foundational consumers may switch to Primitives and recompile
+- Required actions:
+  - run both package-only consumers and assert the resolved runtime graph
+  - run the pre-split compiled-consumer fixture against current forwarders
+  - keep source/binary/behavior/wire release notes separate

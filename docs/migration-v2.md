@@ -5,6 +5,7 @@ workbench:
     - TASK-0003
     - TASK-0004
     - TASK-0009
+    - TASK-0010
   codeRefs: []
   pathHistory:
     - "C:/docs/migration-v2.md"
@@ -85,6 +86,29 @@ Do not deserialize a legacy field directly as a strict type. Parse the old type,
 apply an application-owned conversion policy, then write the new canonical
 field under a versioned schema. Fractional years/months/days require an explicit
 business decision because the strict profile does not approximate them.
+
+## Package split adoption
+
+`Incursa.Types` now depends on `Incursa.Types.Primitives`. Existing consumers
+may keep referencing the rich package; package restore brings Primitives
+transitively. Libraries that need only the dependency-free foundation can
+reference Primitives directly:
+
+```bash
+dotnet add package Incursa.Types.Primitives
+```
+
+| Compatibility dimension | Split-package contract |
+| --- | --- |
+| Source | Moved types retain the `Incursa` namespace. Existing usings remain valid. |
+| Binary | `Incursa.Types` forwards moved public types. An old pre-split consumer binary is exercised against current assemblies in CI. Deploy the complete restored dependency graph; copying only a replacement Types DLL is unsupported. |
+| Behavior | Moving a type does not itself change behavior. Approved behavioral changes are listed separately in this guide. |
+| Wire | Existing moved-type JSON/type-converter payloads remain under regression. New BigDecimal and strict temporal profiles are additions and require explicit schema adoption. |
+
+Both packages currently target net8.0 and are built at one synchronized package
+version. Types declares that produced Primitives version as a runtime dependency.
+Package publication, version selection, and registry rollout require separate
+release approval.
 
 ## Upgrade checklist
 

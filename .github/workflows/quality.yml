@@ -149,6 +149,10 @@ jobs:
         shell: pwsh
         run: ./scripts/verify-primitives-package.ps1 -PackageDirectory artifacts/repro1
 
+      - name: Verify package compatibility and old compiled consumer
+        shell: pwsh
+        run: ./scripts/verify-package-compatibility.ps1 -PackageDirectory artifacts/repro1
+
       - name: Compare nupkg contents (normalized, multi-package)
         id: compare
         shell: bash
