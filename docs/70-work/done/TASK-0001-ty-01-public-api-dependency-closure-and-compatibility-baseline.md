@@ -101,6 +101,8 @@ smallest corrections needed to make the mandated workflow usable:
 - Advances the mutation tool within its compatible 4.x line from 4.9.0 to
   4.16.0; 4.9.0 could not discover the repository's xUnit tests, while 4.16.0
   discovered all 252 tests and completed the focused mutation run locally.
+- Updates the VSTest adapter from 2.8.2 to 3.1.5, which remains compatible with
+  xUnit v2 and provides the current net8.0 adapter used by Linux discovery.
 
 After these corrections the exact formatter and deterministic `-warnaserror`
 build pass with zero warnings/errors. The coverage-gated run passes 252/252
