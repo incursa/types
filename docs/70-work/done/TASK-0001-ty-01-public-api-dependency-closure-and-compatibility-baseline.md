@@ -98,8 +98,9 @@ smallest corrections needed to make the mandated workflow usable:
   when validating the existing behavioral-specification body contract.
 - Normalizes `AclKeyTests.cs` to the repository-required UTF-8 BOM and advances
   MimeKit within the compatible 4.x line from vulnerable 4.14.0 to 4.18.2.
-- Advances the mutation tool within its compatible 4.x line from 4.9.0 to
-  4.16.0; 4.9.0 could not discover the repository's xUnit tests, while 4.16.0
+- Advances the mutation tool from 4.9.0 to 5.1.0 and runs it from the test
+  project in supported project context. The old solution-context invocation
+  failed inside Stryker's bundled Linux VSTest host; the project-context run
   discovered all 252 tests and completed the focused mutation run locally.
 - Updates the VSTest adapter from 2.8.2 to 3.1.5, which remains compatible with
   xUnit v2 and provides the current net8.0 adapter used by Linux discovery.
@@ -107,7 +108,7 @@ smallest corrections needed to make the mandated workflow usable:
 After these corrections the exact formatter and deterministic `-warnaserror`
 build pass with zero warnings/errors. The coverage-gated run passes 252/252
 tests with 73.16% line and 59.83% branch coverage, above the 65%/50% gates.
-The focused mutation run scored 54.74% (150 killed, 6 survived, 0 timeouts or
+The focused mutation run scored 53.82% (141 killed, 5 survived, 0 timeouts or
 errors), above the configured 35% break threshold.
 
 ## Type ownership and behavioral contracts
