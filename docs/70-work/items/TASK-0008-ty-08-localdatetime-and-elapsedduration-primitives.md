@@ -13,7 +13,8 @@ related:
     - /docs/spec/types/LocalDateTime.md
   adrs: []
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/11"
   issues: []
   branches:
     - users/samuelmcaravey/ty-08-temporal-primitives
