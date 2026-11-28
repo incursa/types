@@ -59,6 +59,11 @@ This file maps behavioral specification clauses to concrete tests.
 | BIGDECIMAL-CONVERT-001 | `docs/spec/types/BigDecimal.md` / Exact native conversions | `Incursa.Types.Tests.BigDecimalCoreTests.Decimal_RoundTripsExactly`; `Int32_ExactConversionAcceptsOnlyExactRange`; `Int32_ExactConversionRejectsFractionAndRangeLoss`; `Decimal_ExactConversionMatchesNativeBoundary`; `Decimal_ExactConversionRejectsPrecisionOrRangeLoss` | Implemented |
 | BIGDECIMAL-SQL-001 | `docs/spec/types/BigDecimal.md` / Profiles and bounds | `Incursa.Types.Tests.BigDecimalCoreTests.Decimal38_ProfileAcceptsMandatorySqlDomain` | Implemented |
 | BIGDECIMAL-EVIDENCE-001 | `docs/spec/types/BigDecimal.md` / Requirement and test scenarios | `Incursa.Types.Tests.BigDecimalCoreTests.Parse_NormalizesPythonGeneratedCoreVectors`; `scripts/verify-bigdecimal-core-vectors.py` | Implemented; independent verifier requires Python |
+| BIGDECIMAL-ARITHMETIC-001 | `docs/spec/types/BigDecimal.md` / Exact arithmetic and remainder | `Incursa.Types.Tests.BigDecimalArithmeticTests.ExactOperationsMatchIndependentVectors`; `CompatibleExactOperationsAgreeWithSqlDecimalOracle`; `ContextClassifiesValueAndWorkingResourceFailures` | Implemented |
+| BIGDECIMAL-DIVIDE-001 | `docs/spec/types/BigDecimal.md` / Exact arithmetic and remainder | `Incursa.Types.Tests.BigDecimalArithmeticTests.DivideExactAcceptsOnlyTerminatingBaseTenResults`; `DivideExactClassifiesNonterminatingResults`; `DivisionAndRemainderRejectZeroDivisor` | Implemented |
+| BIGDECIMAL-REMAINDER-001 | `docs/spec/types/BigDecimal.md` / Exact arithmetic and remainder | `Incursa.Types.Tests.BigDecimalArithmeticTests.RemainderUsesDivisionTruncatedTowardZero`; `ExactOperationsMatchIndependentVectors` | Implemented |
+| BIGDECIMAL-ROUND-001 | `docs/spec/types/BigDecimal.md` / Explicit rounding | `Incursa.Types.Tests.BigDecimalArithmeticTests.QuantizeImplementsEveryExplicitRoundingMode`; `DivideRoundedRequiresScaleAndExplicitMode`; `InvalidRoundingModeAndScaleFailExplicitly` | Implemented |
+| BIGDECIMAL-CONTEXT-001 | `docs/spec/types/BigDecimal.md` / Generic math compatibility | `Incursa.Types.Tests.BigDecimalArithmeticTests.ContextsAreImmutableAndOperatorsUseStableDefault`; `ContextClassifiesValueAndWorkingResourceFailures` | Implemented |
 
 ## Supporting Types
 

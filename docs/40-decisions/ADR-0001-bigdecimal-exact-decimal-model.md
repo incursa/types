@@ -4,6 +4,7 @@ workbench:
   workItems:
     - TASK-0005
     - TASK-0006
+    - TASK-0007
   codeRefs: []
   path: /docs/40-decisions/ADR-0001-bigdecimal-exact-decimal-model.md
   pathHistory:

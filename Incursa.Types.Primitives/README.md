@@ -4,8 +4,8 @@ Dependency-free foundational value types and contracts for Incursa .NET
 libraries. Public types retain the `Incursa` namespace so existing source code
 can migrate without namespace changes.
 
-The package includes `BigDecimal` with bounded exact parsing and canonical
-value identity, `Money` with deterministic dependency-free English word
+The package includes `BigDecimal` with bounded exact parsing, canonical value
+identity, checked exact arithmetic, and explicit rounding, `Money` with deterministic dependency-free English word
 formatting, `Percentage`, identifiers, optional values, existing duration and
 period values, and the foundational backed-type contracts.
 
