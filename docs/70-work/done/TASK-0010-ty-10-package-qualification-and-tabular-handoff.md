@@ -1,7 +1,7 @@
 ---
 id: TASK-0010
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -51,9 +51,12 @@ their lifecycle state.
   assemblies and resolves moved types/assembly-qualified identity through
   forwarders. Its isolated baseline build reports only the historical MimeKit
   4.14 advisory already removed from current source.
-- Formatting, type-spec verification, Workbench strict validation, and diff
-  checks pass. Connected deterministic package comparison, mutation, and
-  aggregate Quality Report remain to be recorded from the pull request.
+- Pull request #13 connected CI passes: Workbench Verify; deterministic
+  warn-as-error build; 482 tests and coverage gate; reproducible multi-package
+  packing; Primitives-only, Types-only, and old compiled-consumer package
+  gates; Windows and Ubuntu timezone matrices; mutation testing; and the
+  aggregate Quality Report. Formatting, type-spec verification, Workbench
+  strict validation, and diff checks also pass locally.
 
 ## Acceptance criteria
 
@@ -61,7 +64,7 @@ their lifecycle state.
   both packages, including old compiled-consumer type forwarding.
 - [x] Source, binary, behavior, wire, target-framework, version-constraint,
   generated-artifact, and downstream Tabular boundaries are documented.
-- [ ] Full Release test/build/pack and connected CI evidence are recorded;
+- [x] Full Release test/build/pack and connected CI evidence are recorded;
   publication remains a separate approval.
 - [x] Current draft requirements map to evidence or explicit downstream
   deferral without claiming unimplemented native Tabular admission.
