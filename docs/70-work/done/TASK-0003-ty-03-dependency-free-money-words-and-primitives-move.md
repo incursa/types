@@ -1,7 +1,7 @@
 ---
 id: TASK-0003
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -14,7 +14,8 @@ related:
     - /docs/migration-v2.md
   adrs: []
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/6"
   issues: []
   branches:
     - users/samuelmcaravey/ty-03-money-primitives
