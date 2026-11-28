@@ -59,6 +59,10 @@ years, offsets, and zone designators are outside the profile.
 - `InTimeZone` requires an explicit `TimeZoneInfo`; it rejects ambiguous and
   nonexistent local times instead of choosing an offset. Unambiguous values
   use that named zone's offset.
+- The overload accepting `LocalTimeResolution` makes exceptional DST outcomes
+  explicit: ambiguity can select the earlier or later instant, while gaps can
+  shift fields forward or backward by the transition gap. `Reject` retains the
+  default behavior, and policies that do not match the actual outcome fail.
 - No API consults `TimeZoneInfo.Local` or `DateTimeKind.Local` implicitly.
 
 ## Formatting and serialization
@@ -83,4 +87,6 @@ years, offsets, and zone designators are outside the profile.
 - `LOCALDT-OFFSET-001`: explicit valid/invalid offset resolution.
 - `LOCALDT-ZONE-001`: unambiguous zone resolution and default rejection of DST
   ambiguity/nonexistence.
+- `LOCALDT-ZONE-002`: explicit earlier/later ambiguity and forward/backward gap
+  resolution, including invalid policy/outcome combinations.
 - `LOCALDT-CONVERT-001`: unspecified DateTime and JSON round-trips.

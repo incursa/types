@@ -6,6 +6,7 @@ workbench:
     - TASK-0002
     - TASK-0003
     - TASK-0004
+    - TASK-0009
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/test-traceability.md"
@@ -78,7 +79,17 @@ This file maps behavioral specification clauses to concrete tests.
 | LOCALDT-ARITH-001 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.TemporalPrimitiveTests.LocalDateTimeArithmeticUsesExactElapsedTicksAndChecksRange` | Implemented |
 | LOCALDT-OFFSET-001 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.TemporalPrimitiveTests.ExplicitOffsetResolutionPreservesFieldsAndDefinesInstant` | Implemented |
 | LOCALDT-ZONE-001 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.TemporalPrimitiveTests.NamedZoneResolutionUsesPortableDstOutcomeFixture` | Implemented; Windows/Linux CI uses IANA zone ID |
+| LOCALDT-ZONE-002 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.StrictCalendarTemporalTests.LocalTimeResolutionHandlesAmbiguitiesAndGapsExplicitly` | Implemented; Windows/Linux CI uses IANA zone ID |
 | LOCALDT-CONVERT-001 | `docs/spec/types/LocalDateTime.md` / Formatting and serialization | `Incursa.Types.Tests.TemporalPrimitiveTests.LocalDateTimeFormattingAndJsonAreCanonical`; `LocalDateTimeRejectsDateTimeWithImplicitZoneSemantics` | Implemented |
+| CALDUR-PARSE-001 | `docs/spec/types/CalendarDuration.md` / Value and lexical profile | `Incursa.Types.Tests.StrictCalendarTemporalTests.CalendarDurationNormalizesStrictInput`; `CalendarDurationRejectsNonStrictOrInexactInput` | Implemented |
+| CALDUR-SIGN-001 | `docs/spec/types/CalendarDuration.md` / Value and lexical profile | `Incursa.Types.Tests.StrictCalendarTemporalTests.CalendarDurationRequiresOneSignAndAppliesComponentsInOrder` | Implemented |
+| CALDUR-APPLY-001 | `docs/spec/types/CalendarDuration.md` / Application | `Incursa.Types.Tests.StrictCalendarTemporalTests.CalendarDurationRequiresOneSignAndAppliesComponentsInOrder`; `CalendarApplicationResolvesCalendarFieldsBeforeExactElapsedTime` | Implemented |
+| CALDUR-ZONE-001 | `docs/spec/types/CalendarDuration.md` / Application | `Incursa.Types.Tests.StrictCalendarTemporalTests.LocalTimeResolutionHandlesAmbiguitiesAndGapsExplicitly`; `CalendarApplicationResolvesCalendarFieldsBeforeExactElapsedTime` | Implemented; Windows/Linux CI uses IANA zone ID |
+| CALDUR-JSON-001 | `docs/spec/types/CalendarDuration.md` / Serialization and compatibility | `Incursa.Types.Tests.StrictCalendarTemporalTests.CalendarDurationJsonUsesCanonicalText` | Implemented |
+| EXACTPERIOD-BOUNDARY-001 | `docs/spec/types/ExactPeriod.md` / Value and interval semantics | `Incursa.Types.Tests.StrictCalendarTemporalTests.ExactPeriodUsesHalfOpenNonOverlappingBoundaries` | Implemented |
+| EXACTPERIOD-IDENTITY-001 | `docs/spec/types/ExactPeriod.md` / Value and interval semantics | `Incursa.Types.Tests.StrictCalendarTemporalTests.ExactPeriodEqualityIncludesDeclaredOffsets` | Implemented |
+| EXACTPERIOD-PARSE-001 | `docs/spec/types/ExactPeriod.md` / Construction and serialization | `Incursa.Types.Tests.StrictCalendarTemporalTests.ExactPeriodCanonicalAndJsonRoundTripOffsetsAndTicks` | Implemented |
+| EXACTPERIOD-DURATION-001 | `docs/spec/types/ExactPeriod.md` / Construction and serialization | `Incursa.Types.Tests.StrictCalendarTemporalTests.ExactPeriodUsesHalfOpenNonOverlappingBoundaries`; `ExactPeriodCanBeBuiltFromCalendarDurationAndZonePolicy` | Implemented |
 
 ## Supporting Types
 

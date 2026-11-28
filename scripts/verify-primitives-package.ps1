@@ -82,13 +82,15 @@ BigDecimal exact = BigDecimal.Parse("12345678901234567890.0100");
 BigDecimal roundedEighth = BigDecimal.One.DivideRounded(BigDecimal.Parse("8"), 2, BigDecimalRoundingMode.ToNearestTiesToEven);
 ElapsedDuration elapsed = ElapsedDuration.Parse("-PT1.0000001S");
 LocalDateTime local = LocalDateTime.Parse("2024-02-29T12:34:56.1234567");
+CalendarDuration calendar = CalendarDuration.Parse("P1Y1DT1.0000001S");
+ExactPeriod period = ExactPeriod.FromElapsed(DateTimeOffset.UnixEpoch, new ElapsedDuration(1));
 
-if (id.Value != 42 || percentage.Value != 0.125m || duration.Hours != 1 || money.ToWords() != "one dollar and one cent" || exact.ToString() != "1234567890123456789001e-2" || roundedEighth.ToString() != "12e-2" || elapsed.Units != -10000001 || local.SubsecondTicks != 1234567 || LocalDateTime.FromTicks(local.Ticks) != local)
+if (id.Value != 42 || percentage.Value != 0.125m || duration.Hours != 1 || money.ToWords() != "one dollar and one cent" || exact.ToString() != "1234567890123456789001e-2" || roundedEighth.ToString() != "12e-2" || elapsed.Units != -10000001 || local.SubsecondTicks != 1234567 || LocalDateTime.FromTicks(local.Ticks) != local || calendar.ToString() != "P12M1DT1.0000001S" || period.Elapsed.Units != 1)
 {
     return 1;
 }
 
-Console.WriteLine($"{id}|{percentage}|{duration}|{money.ToWords()}|{exact}|{roundedEighth}|{elapsed}|{local}");
+Console.WriteLine($"{id}|{percentage}|{duration}|{money.ToWords()}|{exact}|{roundedEighth}|{elapsed}|{local}|{calendar}|{period}");
 return 0;
 '@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Program.cs") -Encoding utf8
 

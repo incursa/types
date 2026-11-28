@@ -22,10 +22,13 @@ public sealed class PrimitivePackageBoundaryTests
     [
         typeof(BigDecimal),
         typeof(BigDecimalProfile),
+        typeof(CalendarDuration),
         typeof(Duration),
         typeof(ElapsedDuration),
+        typeof(ExactPeriod),
         typeof(FastId),
         typeof(LocalDateTime),
+        typeof(LocalTimeResolution),
         typeof(Maybe<>),
         typeof(Money),
         typeof(Percentage),
