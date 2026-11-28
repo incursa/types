@@ -1,7 +1,7 @@
 ---
 id: TASK-0005
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -78,6 +78,9 @@ claim implementation or mutate requirement lifecycle.
   skipped using `DOTNET_ROLL_FORWARD=Major` on this workstation; connected CI
   supplies the pinned .NET 8 runtime.
 - No production code or package dependency changed in this design-only slice.
+- PR #8 connected validation: Workbench Verify, Windows/Ubuntu timezone
+  regression matrix, full verify/coverage/packaging, package-only consumer,
+  both mutation scopes, and aggregate Quality Report all passed.
 
 ## Acceptance criteria
 
