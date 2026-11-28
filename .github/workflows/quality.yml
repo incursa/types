@@ -296,19 +296,16 @@ jobs:
       - name: Install Stryker
         run: dotnet tool install --tool-path .tools dotnet-stryker --version 5.1.0
 
-      - name: Run mutation tests
+      - name: Run Primitives mutation tests
         id: stryker
         working-directory: Incursa.Types.Tests
         run: |
           ../.tools/dotnet-stryker \
-            -p Incursa.Types.csproj \
+            -p Incursa.Types.Primitives.csproj \
             -l Basic \
             -L \
             -m "**/Money.cs" \
-            -m "**/JsonContext.cs" \
-            -m "**/MonthOnly.cs" \
             -m "**/Percentage.cs" \
-            -m "**/TimeZoneId.cs" \
             -b 35 \
             --threshold-low 35 \
             --threshold-high 55 \
@@ -318,6 +315,25 @@ jobs:
             -r Markdown \
             -r Json \
             -O ../artifacts/stryker \
+            --skip-version-check
+
+      - name: Run rich Types mutation regression
+        working-directory: Incursa.Types.Tests
+        run: |
+          ../.tools/dotnet-stryker \
+            -p Incursa.Types.csproj \
+            -l Basic \
+            -L \
+            -m "**/JsonContext.cs" \
+            -m "**/MonthOnly.cs" \
+            -m "**/TimeZoneId.cs" \
+            -b 35 \
+            --threshold-low 35 \
+            --threshold-high 55 \
+            --break-on-initial-test-failure \
+            -r Progress \
+            -r Json \
+            -O ../artifacts/stryker-rich \
             --skip-version-check
 
       - name: Collect mutation metrics
@@ -332,7 +348,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mutation-report
-          path: artifacts/stryker
+          path: |
+            artifacts/stryker
+            artifacts/stryker-rich
 
       - name: Upload mutation metrics
         if: always()

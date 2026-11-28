@@ -1,7 +1,8 @@
 ---
 workbench:
-  type: doc
-  workItems: []
+  type: spec
+  workItems:
+    - TASK-0003
   codeRefs: []
   pathHistory:
     - "C:/docs/migration-v2.md"
@@ -24,6 +25,7 @@ If you are upgrading from earlier versions, review the changes below and update 
 | `TypeConverter` invalid input | Could coerce to default in several types | Throws `FormatException` on invalid input | Add exception handling in model-binding/config pipelines |
 | `EncryptedString` | No meaningful invariant enforcement | Requires Base64 ciphertext-like payload | Ensure callers pass encrypted/base64 data, not plain text |
 | `Money` normalization | Fractional normalization truncated excess precision | Values normalize with banker's rounding (`MidpointRounding.ToEven`) to 2 decimals | Rebaseline midpoint-sensitive financial assertions (for example `1.005`, `1.015`) |
+| `Money.ToWords()` | Humanizer with hard-coded plural labels; negative sub-dollar values lost their sign/cents; values beyond `long` failed | Dependency-free deterministic English grammar with singular/plural labels, exact negative cents, and full `decimal` range through octillion | Rebaseline word snapshots for singular, negative sub-dollar, or very large amounts |
 | `MonthOnly` namespace | `Incursa.Types` | `Incursa` | Update imports/usings |
 
 ## Behavioral hardening
@@ -47,6 +49,14 @@ Console.WriteLine(ctx.ToString()); // {}
 ```csharp
 CultureInfo.CurrentCulture = new CultureInfo("fr-FR");
 JsonSerializer.Serialize(new Money(12.34m)); // "12.34"
+```
+
+`Money.ToWords()` remains English-only. It always emits a dollar phrase and
+emits a cents phrase only for non-zero normalized cents:
+
+```csharp
+new Money(1.01m).ToWords();  // "one dollar and one cent"
+new Money(-0.01m).ToWords(); // "minus zero dollars and one cent"
 ```
 
 ## Upgrade checklist

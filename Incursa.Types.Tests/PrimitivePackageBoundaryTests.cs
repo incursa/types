@@ -23,6 +23,7 @@ public sealed class PrimitivePackageBoundaryTests
         typeof(Duration),
         typeof(FastId),
         typeof(Maybe<>),
+        typeof(Money),
         typeof(Percentage),
         typeof(Period),
         typeof(ShortCode),
@@ -49,6 +50,14 @@ public sealed class PrimitivePackageBoundaryTests
         Type[] forwardedTypes = typeof(BvFile).Assembly.GetForwardedTypes();
 
         primitivesAssembly.GetExportedTypes().ShouldAllBe(type => forwardedTypes.Contains(type));
+    }
+
+    [Fact]
+    public void AssemblyQualifiedMoneyIdentityResolvesThroughRichPackageForwarder()
+    {
+        Type? resolvedType = Type.GetType("Incursa.Money, Incursa.Types", throwOnError: true);
+
+        resolvedType.ShouldBe(typeof(Money));
     }
 
     [Fact]

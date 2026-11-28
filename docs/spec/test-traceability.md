@@ -4,6 +4,7 @@ workbench:
   workItems:
     - TASK-0001
     - TASK-0002
+    - TASK-0003
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/test-traceability.md"
@@ -29,6 +30,7 @@ This file maps behavioral specification clauses to concrete tests.
 | MONEY-PARSE-002 | `docs/spec/types/Money.md` / Parse/TryParse | `Incursa.Types.Tests.MoneyTests.TryParse_InvalidValue_ReturnsFalse` | Implemented |
 | MONEY-CONVERT-001 | `docs/spec/types/Money.md` / Converters/Serialization | `Incursa.Types.Tests.MoneyTests.JsonConverter_RoundTripsInvariantValue` | Implemented |
 | MONEY-CONVERT-002 | `docs/spec/types/Money.md` / Converters/Serialization | `Incursa.Types.Tests.MoneyTests.TypeConverter_ConvertsToAndFromString` | Implemented |
+| MONEY-WORDS-001..005 | `docs/spec/types/Money.md` / English Money Words | `Incursa.Types.Tests.MoneyTests.ToWords_ProducesExpectedOutput`, `ToWords_UsesDocumentedCurrencyGrammar`, `ToWords_SupportsFullDecimalRangeWithoutPrecisionLoss`, `ToWords_UsesNormalizedMidpointToEvenAmount` | Implemented |
 | PCT-NORM-001 | `docs/spec/types/Percentage.md` / Normalization Rules | `Incursa.Types.Tests.PercentageTests.Value_TruncatesToFourDecimalPlaces` | Implemented |
 | PCT-PARSE-001 | `docs/spec/types/Percentage.md` / Parse/TryParse | `Incursa.Types.Tests.SpecDrivenWaveOneHardeningTests.Percentage_Formatting_Parsing_Converters_AndComparison_AreConsistent` | Implemented |
 | PCT-SCALED-001 | `docs/spec/types/Percentage.md` / ParseScaled | `Incursa.Types.Tests.SpecDrivenCoreTypesTests.Percentage_ParseScaled_InterpretsScaledInput` | Implemented |

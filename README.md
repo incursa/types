@@ -21,8 +21,8 @@ dotnet add package Incursa.Types.Primitives
 ```
 
 `Incursa.Types` references `Incursa.Types.Primitives`, so existing full-package
-consumers continue to receive `FastId`, `ShortCode`, `Maybe<T>`, `Percentage`,
-`Duration`, `Period`, and the backed-type interfaces. Their `Incursa` namespaces
+consumers continue to receive `FastId`, `ShortCode`, `Maybe<T>`, `Money`,
+`Percentage`, `Duration`, `Period`, and the backed-type interfaces. Their `Incursa` namespaces
 are unchanged. Libraries that need only this dependency-free foundation can
 reference `Incursa.Types.Primitives` directly.
 
