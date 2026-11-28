@@ -18,7 +18,6 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CommunityToolkit.Diagnostics;
 
 /// <summary>
 /// This represents an ISO 8601 Time Interval, of the format {DateTime}/{Duration}.
@@ -66,7 +65,7 @@ public readonly record struct Period
 
     public static Period Parse(string value)
     {
-        Guard.IsNotNullOrWhiteSpace(value);
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
 
         var split = value.Split('/');
         if (split.Length != 2)

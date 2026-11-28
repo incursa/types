@@ -21,6 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Incursa.Types.Primitives\Incursa.Types.Primitives.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.4.0" />
     <PackageReference Include="Cronos" Version="0.11.1" />
     <PackageReference Include="Humanizer.Core" Version="3.0.1" />

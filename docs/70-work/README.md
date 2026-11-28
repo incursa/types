@@ -66,4 +66,5 @@ _None._
 | Item | Status | GitHub | Issues | Related |
 | --- | --- | --- | --- | --- |
 | [TASK-0001 - TY-01 public API, dependency closure, and compatibility baseline](done/TASK-0001-ty-01-public-api-dependency-closure-and-compatibility-baseline.md) | ✅ done | [view](https://github.com/incursa/types/blob/main/docs/70-work/done/TASK-0001-ty-01-public-api-dependency-closure-and-compatibility-baseline.md) | - | [Behavioral Specification Guide](../spec/README.md), [Compatibility Decisions](../spec/compat-decisions.md), [Spec to Test Traceability](../spec/test-traceability.md) |
+| [TASK-0002 - TY-02 extract dependency-free primitives package](done/TASK-0002-ty-02-extract-dependency-free-primitives-package.md) | ✅ done | [PR #5](https://github.com/incursa/types/pull/5) | - | [Behavioral Specification Guide](../spec/README.md), [Compatibility Decisions](../spec/compat-decisions.md), [Spec to Test Traceability](../spec/test-traceability.md) |
 <!-- workbench:work-index:end -->

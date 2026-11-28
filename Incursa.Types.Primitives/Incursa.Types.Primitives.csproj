@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Incursa</RootNamespace>
+    <PackageId>Incursa.Types.Primitives</PackageId>
+    <Description>Dependency-free shared value types and foundational contracts for Incursa .NET libraries.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/incursa/types</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/incursa/types</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageTags>dotnet;value-objects;ddd;primitives;strongly-typed</PackageTags>
+    <PackageIcon>nuget_logo.png</PackageIcon>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Incursa</Authors>
+    <Company>Incursa</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Incursa.Types.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\assets\nuget_logo.png" Pack="true" PackagePath="\" Link="nuget_logo.png" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="DotNet.ReproducibleBuilds.Isolated" Version="1.2.39" />
+    <PackageReference Update="Meziantou.Analyzer" Version="2.0.257" />
+    <PackageReference Update="Microsoft.CodeAnalysis.AnalyzerUtilities" Version="3.3.4" />
+    <PackageReference Update="Roslynator.Analyzers" Version="4.14.1" />
+    <PackageReference Update="Roslynator.CodeAnalysis.Analyzers" Version="4.14.1" />
+    <PackageReference Update="Roslynator.Formatting.Analyzers" Version="4.14.1" />
+  </ItemGroup>
+
+</Project>
