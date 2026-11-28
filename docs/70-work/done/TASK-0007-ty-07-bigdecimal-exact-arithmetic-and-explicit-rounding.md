@@ -1,7 +1,7 @@
 ---
 id: TASK-0007
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -74,8 +74,11 @@ evidence without promoting requirement lifecycle state.
 - Warn-as-error deterministic build, formatting, benchmark build/run,
   Workbench strict validation, type-spec verification, and diff checks pass.
 - Package-only nupkg restore/build/run exercises explicit rounded division and
-  passes with zero runtime package dependencies. Connected CI remains to be
-  recorded.
+  passes with zero runtime package dependencies.
+- PR #10 connected validation passed Workbench, Windows/Ubuntu timezone
+  regression, warn-as-error build, 394 tests, coverage gates, package-only
+  consumer, deterministic packaging, both mutation scopes, and aggregate
+  Quality Report.
 
 ## Acceptance criteria
 
@@ -83,5 +86,5 @@ evidence without promoting requirement lifecycle state.
   cross-representation equality tests pass.
 - [x] Generic-math compatibility and baseline benchmark evidence are recorded;
   no implicit rounding or third-party runtime dependency is introduced.
-- [ ] Applicable requirements map to code/tests or explicit deferral and
+- [x] Applicable requirements map to code/tests or explicit deferral and
   Release solution plus connected CI results are recorded.
