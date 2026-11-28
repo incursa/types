@@ -1,7 +1,7 @@
 ---
 id: TASK-0004
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -91,12 +91,15 @@ does not promote or otherwise mutate the requirements.
   (69 killed, 5 survived, 0 timeouts/errors), above the 35% break threshold
   after the Linux alias-resolution correction.
 - The packed full-package nuspec and restore assets contain no
-  TimeZoneConverter dependency. Connected Windows/Linux CI evidence remains
-  pending until the branch is pushed.
+  TimeZoneConverter dependency.
+- PR #7 connected validation: Workbench Verify passed; Windows and Ubuntu
+  platform/invariant jobs passed; full verify, coverage, deterministic
+  packaging, package-only consumer, both mutation scopes, and the aggregate
+  Quality Report passed.
 
 ## Acceptance criteria
 
-- [ ] Windows and Linux CI prove representative Windows IDs, canonical IANA
+- [x] Windows and Linux CI prove representative Windows IDs, canonical IANA
   IDs, and aliases.
 - [x] TimeZoneConverter is absent from restored and packed dependency assets.
 - [x] Requirements, implementation, tests, compatibility decision, and
