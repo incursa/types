@@ -15,7 +15,8 @@ related:
     - /docs/migration-v2.md
   adrs: []
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/7"
   issues: []
   branches:
     - users/samuelmcaravey/ty-04-platform-timezones
