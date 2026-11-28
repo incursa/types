@@ -290,14 +290,14 @@ jobs:
         run: dotnet restore Incursa.Core.slnx
 
       - name: Install Stryker
-        run: dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
+        run: dotnet tool install --tool-path .tools dotnet-stryker --version 5.1.0
 
       - name: Run mutation tests
         id: stryker
+        working-directory: Incursa.Types.Tests
         run: |
-          ./.tools/dotnet-stryker \
-            -p Incursa.Types/Incursa.Types.csproj \
-            -tp Incursa.Types.Tests/Incursa.Types.Tests.csproj \
+          ../.tools/dotnet-stryker \
+            -p Incursa.Types.csproj \
             -l Basic \
             -L \
             -m "**/Money.cs" \
@@ -313,7 +313,7 @@ jobs:
             -r Html \
             -r Markdown \
             -r Json \
-            -O artifacts/stryker \
+            -O ../artifacts/stryker \
             --skip-version-check
 
       - name: Collect mutation metrics

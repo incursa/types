@@ -1,7 +1,8 @@
 ---
 workbench:
-  type: doc
-  workItems: []
+  type: spec
+  workItems:
+    - TASK-0001
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/README.md"
