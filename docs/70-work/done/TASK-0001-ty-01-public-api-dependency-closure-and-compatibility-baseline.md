@@ -14,7 +14,8 @@ related:
     - /docs/spec/test-traceability.md
   adrs: []
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/4"
   issues: []
   branches:
     - users/samuelmcaravey/ty-01-types-baseline

@@ -72,14 +72,38 @@ $requiredSections = @(
 $validationErrors = @()
 foreach ($typeName in $requiredSpecs) {
     $file = Join-Path $SpecDirectory "$typeName.md"
-    $content = Get-Content -Path $file -Raw
     $lines = Get-Content -Path $file
 
-    if ($content -match '\$\(' -or $content -match '\$today') {
+    # Workbench-managed documentation carries YAML front matter before the
+    # behavioral-specification body. Validate the body contract independently
+    # so navigation metadata does not invalidate an otherwise valid spec.
+    if ($lines.Count -gt 0 -and $lines[0].Trim() -eq '---') {
+        $frontMatterEnd = -1
+        for ($lineIndex = 1; $lineIndex -lt $lines.Count; $lineIndex++) {
+            if ($lines[$lineIndex].Trim() -eq '---') {
+                $frontMatterEnd = $lineIndex
+                break
+            }
+        }
+
+        if ($frontMatterEnd -lt 0) {
+            $validationErrors += "$file has unterminated YAML front matter."
+            continue
+        }
+
+        $lines = @($lines | Select-Object -Skip ($frontMatterEnd + 1))
+        while ($lines.Count -gt 0 -and [string]::IsNullOrWhiteSpace($lines[0])) {
+            $lines = @($lines | Select-Object -Skip 1)
+        }
+    }
+
+    $bodyContent = $lines -join [Environment]::NewLine
+
+    if ($bodyContent -match '\$\(' -or $bodyContent -match '\$today') {
         $validationErrors += "$file contains unresolved template placeholders."
     }
 
-    if ($content.ToCharArray() | Where-Object { [int]$_ -lt 32 -and $_ -notin @("`r", "`n", "`t") }) {
+    if ($bodyContent.ToCharArray() | Where-Object { [int]$_ -lt 32 -and $_ -notin @("`r", "`n", "`t") }) {
         $validationErrors += "$file contains unexpected control characters."
     }
 
@@ -113,7 +137,7 @@ foreach ($typeName in $requiredSpecs) {
     }
 
     foreach ($section in $requiredSections) {
-        if ($content -notmatch [regex]::Escape($section)) {
+        if ($bodyContent -notmatch [regex]::Escape($section)) {
             $validationErrors += "$file is missing required section '$section'."
         }
     }
