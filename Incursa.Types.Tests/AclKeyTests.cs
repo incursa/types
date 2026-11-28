@@ -1,4 +1,4 @@
-namespace Incursa.Types.Tests;
+﻿namespace Incursa.Types.Tests;
 
 public sealed class AclKeyTests
 {
