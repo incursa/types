@@ -45,6 +45,8 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(Incursa.INumberBackedType<,>))]
 [assembly: TypeForwardedTo(typeof(Incursa.IStringBackedType<>))]
 [assembly: TypeForwardedTo(typeof(Incursa.Maybe<>))]
+[assembly: TypeForwardedTo(typeof(Incursa.Money))]
+[assembly: TypeForwardedTo(typeof(Incursa.MoneyExtensions))]
 [assembly: TypeForwardedTo(typeof(Incursa.Percentage))]
 [assembly: TypeForwardedTo(typeof(Incursa.Period))]
 [assembly: TypeForwardedTo(typeof(Incursa.ShortCode))]

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Incursa.Types.Primitives\Incursa.Types.Primitives.csproj" />
     <ProjectReference Include="..\Incursa.Types\Incursa.Types.csproj" />
   </ItemGroup>
 

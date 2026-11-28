@@ -14,7 +14,6 @@
 
 using System.ComponentModel;
 using System.Globalization;
-using Humanizer;
 
 namespace Incursa;
 
@@ -30,6 +29,58 @@ public readonly record struct Money
           ISpanParsable<Money>,
           IDecimalBackedType<Money>
 {
+    private static readonly string[] SmallNumberWords =
+    [
+        "zero",
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+    ];
+
+    private static readonly string[] TensWords =
+    [
+        string.Empty,
+        string.Empty,
+        "twenty",
+        "thirty",
+        "forty",
+        "fifty",
+        "sixty",
+        "seventy",
+        "eighty",
+        "ninety",
+    ];
+
+    private static readonly string[] ScaleWords =
+    [
+        string.Empty,
+        "thousand",
+        "million",
+        "billion",
+        "trillion",
+        "quadrillion",
+        "quintillion",
+        "sextillion",
+        "septillion",
+        "octillion",
+    ];
+
     private readonly decimal rawValue;
 
     /// <summary>
@@ -419,20 +470,96 @@ public readonly record struct Money
     public override string ToString() => ToDecimal().ToString(CultureInfo.InvariantCulture);
 
     /// <summary>
-    /// Returns the value in words (e.g., "one hundred dollars and fifty cents").
+    /// Returns the normalized value in deterministic English words.
     /// </summary>
+    /// <remarks>
+    /// The result uses short-scale names through octillion, prefixes negative
+    /// values with <c>minus</c>, uses singular currency labels only for exactly
+    /// one unit, and omits the cents clause when cents are zero. This covers the
+    /// complete <see cref="decimal"/> range without converting the amount to a
+    /// floating-point or 64-bit integer representation.
+    /// </remarks>
     public string ToWords()
     {
-        var dollars = IntegerValue;
-        var cents = FractionalValue;
+        decimal amount = ToDecimal();
+        bool isNegative = amount < decimal.Zero;
+        decimal absoluteAmount = decimal.Abs(amount);
+        decimal dollars = decimal.Truncate(absoluteAmount);
+        int cents = decimal.ToInt32((absoluteAmount - dollars) * 100m);
 
-        var dollarsStr = dollars.ToWords();
-        var centsStr = cents.ToWords();
-
-        var result = dollarsStr + " dollars";
+        string dollarLabel = dollars == decimal.One ? "dollar" : "dollars";
+        string result = IntegerToWords(dollars) + " " + dollarLabel;
         if (cents > 0)
         {
-            result += " and " + centsStr + " cents";
+            string centLabel = cents == 1 ? "cent" : "cents";
+            result += " and " + IntegerToWords(cents) + " " + centLabel;
+        }
+
+        return isNegative ? "minus " + result : result;
+    }
+
+    private static string IntegerToWords(decimal value)
+    {
+        if (value == decimal.Zero)
+        {
+            return SmallNumberWords[0];
+        }
+
+        var groups = new List<string>(ScaleWords.Length);
+        int scaleIndex = 0;
+        while (value > decimal.Zero)
+        {
+            int group = decimal.ToInt32(value % 1000m);
+            if (group > 0)
+            {
+                string groupWords = UnderOneThousandToWords(group);
+                if (scaleIndex > 0)
+                {
+                    groupWords += " " + ScaleWords[scaleIndex];
+                }
+
+                groups.Add(groupWords);
+            }
+
+            value = decimal.Truncate(value / 1000m);
+            scaleIndex++;
+        }
+
+        groups.Reverse();
+        return string.Join(' ', groups);
+    }
+
+    private static string UnderOneThousandToWords(int value)
+    {
+        int hundreds = value / 100;
+        int remainder = value % 100;
+        string result = string.Empty;
+
+        if (hundreds > 0)
+        {
+            result = SmallNumberWords[hundreds] + " hundred";
+            if (remainder > 0)
+            {
+                result += " and ";
+            }
+        }
+
+        if (remainder < 20)
+        {
+            if (remainder > 0)
+            {
+                result += SmallNumberWords[remainder];
+            }
+
+            return result;
+        }
+
+        int tens = remainder / 10;
+        int ones = remainder % 10;
+        result += TensWords[tens];
+        if (ones > 0)
+        {
+            result += "-" + SmallNumberWords[ones];
         }
 
         return result;

@@ -1,7 +1,8 @@
 ---
 workbench:
-  type: doc
-  workItems: []
+  type: spec
+  workItems:
+    - TASK-0003
   codeRefs: []
   pathHistory:
     - "C:/docs/spec/types/Money.md"
@@ -13,7 +14,8 @@ workbench:
 - Type: `Money`
 - Namespace: `Incursa`
 - Status: `Approved`
-- Last Updated: `2026-02-19`
+- Last Updated: `2026-11-27`
+- Defining package: `Incursa.Types.Primitives`
 
 ## Domain Purpose
 Represents monetary amounts as normalized decimal values with stable formatting and deterministic arithmetic.
@@ -62,6 +64,25 @@ Examples:
 - **MONEY-FORMAT-001**: `ToString()` returns invariant canonical numeric form.
 - **MONEY-FORMAT-002**: `ToCurrency`, `ToAccounting`, `ToNumberString`, `ToPlainNumberString` use provided static format profiles.
 
+### English Money Words
+- **MONEY-WORDS-001**: `ToWords()` formats the normalized value directly from
+  `decimal`; it does not convert the full amount to `long`, `double`, or another
+  precision-losing representation.
+- **MONEY-WORDS-002**: Negative non-zero values use the `minus` prefix. Zero,
+  including a normalized negative zero, is `zero dollars`.
+- **MONEY-WORDS-003**: The dollar phrase is always present. It uses `dollar`
+  only for exactly one dollar and `dollars` otherwise. A cents clause is
+  appended only when normalized cents are non-zero, using `cent` only for one.
+- **MONEY-WORDS-004**: Values below one dollar retain the dollar phrase, for
+  example `0.01` is `zero dollars and one cent` and `-0.01` is
+  `minus zero dollars and one cent`.
+- **MONEY-WORDS-005**: Integers use deterministic US English short-scale names,
+  British-style `and` within a non-zero hundreds group, and hyphens for compound
+  tens. Supported scales are thousand through octillion, covering the full
+  normalized `decimal` range.
+- **MONEY-WORDS-006**: General localization and currency selection are outside
+  this API. Currency labels are the English `dollar(s)` and `cent(s)`.
+
 ### Arithmetic/Comparison
 - **MONEY-ARITH-001**: All arithmetic operators return normalized `Money` results.
 - **MONEY-ARITH-002**: Comparison operators compare normalized backing value.
@@ -79,6 +100,13 @@ Examples:
 
 ## Compatibility Notes
 - DEC-001 approved change: normalization switched from truncation to banker's rounding.
+- TY-03 removes Humanizer without hiding observable fixes. Conventional output
+  such as `123.45` remains `one hundred and twenty-three dollars and forty-five
+  cents`. Singular amounts now use `one dollar`/`one cent` instead of the prior
+  hard-coded plurals. Negative sub-dollar amounts now retain their sign and
+  cents instead of collapsing to `zero dollars`. Amounts outside the `long`
+  range now format through octillion instead of failing during integer
+  conversion.
 
 ## Test Requirements
 - Required scenario IDs for traceability:
@@ -86,5 +114,10 @@ Examples:
   - `MONEY-PARSE-001`
   - `MONEY-PARSE-002`
   - `MONEY-FORMAT-001`
+  - `MONEY-WORDS-001`
+  - `MONEY-WORDS-002`
+  - `MONEY-WORDS-003`
+  - `MONEY-WORDS-004`
+  - `MONEY-WORDS-005`
   - `MONEY-ARITH-001`
   - `MONEY-CONVERT-001`

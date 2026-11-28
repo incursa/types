@@ -184,6 +184,45 @@ public class MoneyTests
         Assert.DoesNotContain("cents", words, StringComparison.Ordinal);
     }
 
+    [Theory]
+    [InlineData("0", "zero dollars")]
+    [InlineData("1", "one dollar")]
+    [InlineData("2", "two dollars")]
+    [InlineData("0.01", "zero dollars and one cent")]
+    [InlineData("0.02", "zero dollars and two cents")]
+    [InlineData("-0.01", "minus zero dollars and one cent")]
+    [InlineData("-1.01", "minus one dollar and one cent")]
+    [InlineData("1000001.10", "one million one dollars and ten cents")]
+    [InlineData("1001001001", "one billion one million one thousand one dollars")]
+    public void ToWords_UsesDocumentedCurrencyGrammar(string input, string expected)
+    {
+        Assert.Equal(expected, Money.Parse(input).ToWords());
+    }
+
+    [Fact]
+    public void ToWords_SupportsFullDecimalRangeWithoutPrecisionLoss()
+    {
+        const string MaximumWords = "seventy-nine octillion two hundred and twenty-eight septillion " +
+                                    "one hundred and sixty-two sextillion five hundred and fourteen quintillion " +
+                                    "two hundred and sixty-four quadrillion three hundred and thirty-seven trillion " +
+                                    "five hundred and ninety-three billion five hundred and forty-three million " +
+                                    "nine hundred and fifty thousand three hundred and thirty-five dollars";
+
+        Assert.Equal(MaximumWords, new Money(decimal.MaxValue).ToWords());
+        Assert.Equal("minus " + MaximumWords, new Money(decimal.MinValue).ToWords());
+    }
+
+    [Theory]
+    [InlineData("0.005", "zero dollars")]
+    [InlineData("0.015", "zero dollars and two cents")]
+    [InlineData("-0.015", "minus zero dollars and two cents")]
+    public void ToWords_UsesNormalizedMidpointToEvenAmount(string input, string expected)
+    {
+        decimal value = decimal.Parse(input, CultureInfo.InvariantCulture);
+
+        Assert.Equal(expected, new Money(value).ToWords());
+    }
+
     [Fact]
     public void CompareTo_ObjectMoney_UsesUnderlyingValue()
     {

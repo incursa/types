@@ -27,7 +27,6 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.4.0" />
     <PackageReference Include="Cronos" Version="0.11.1" />
-    <PackageReference Include="Humanizer.Core" Version="3.0.1" />
       <PackageReference Include="Incursa.Generators" Version="2026.2.19.38">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

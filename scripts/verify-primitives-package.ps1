@@ -61,6 +61,7 @@ try {
     }
 
     $consumerProject = Join-Path $consumerRoot "PackageConsumer.csproj"
+    $consumerPackageCache = Join-Path $consumerRoot "packages"
     $projectText = Get-Content -LiteralPath $consumerProject -Raw
     $projectText = $projectText -replace "<TargetFramework>[^<]+</TargetFramework>", "<TargetFramework>net8.0</TargetFramework>"
     Set-Content -LiteralPath $consumerProject -Value $projectText -Encoding utf8
@@ -76,17 +77,18 @@ using Incursa;
 FastId id = FastId.From(42);
 Percentage percentage = Percentage.ParseScaled("12.5");
 Duration duration = Duration.Parse("PT1H");
+Money money = new(1.01m);
 
-if (id.Value != 42 || percentage.Value != 0.125m || duration.Hours != 1)
+if (id.Value != 42 || percentage.Value != 0.125m || duration.Hours != 1 || money.ToWords() != "one dollar and one cent")
 {
     return 1;
 }
 
-Console.WriteLine($"{id}|{percentage}|{duration}");
+Console.WriteLine($"{id}|{percentage}|{duration}|{money.ToWords()}");
 return 0;
 '@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Program.cs") -Encoding utf8
 
-    dotnet restore $consumerProject --source $resolvedPackageDirectory
+    dotnet restore $consumerProject --packages $consumerPackageCache -p:RestoreAdditionalProjectSources=$resolvedPackageDirectory
     if ($LASTEXITCODE -ne 0) {
         throw "The package-only consumer restore failed."
     }
