@@ -1,7 +1,7 @@
 ---
 id: TASK-0009
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -59,11 +59,14 @@ promoting requirement lifecycle state.
   type-spec verification, and diff checks pass.
 - Package-only nupkg restore/build/run consumes `CalendarDuration` and
   `ExactPeriod` and passes with zero runtime package dependencies.
-- Connected Windows/Linux temporal validation and the full Quality Gate remain
-  to be recorded from the pull request.
+- PR #12 connected validation passed Workbench, Windows/Ubuntu temporal and
+  invariant-globalization matrices, warn-as-error build, 482 tests, coverage
+  gates, package-only consumer, deterministic packaging, both mutation scopes,
+  and the aggregate Quality Report.
 
 ## Acceptance criteria
 
 - [x] Legacy and strict profiles plus source/binary/behavior/wire migration are documented.
 - [x] Current draft requirements map to implementation and automated tests.
 - [x] Month-end, leap, negative, 100ns, empty/touching, offset-identity, and portable DST ambiguity/gap cases are covered.
+
