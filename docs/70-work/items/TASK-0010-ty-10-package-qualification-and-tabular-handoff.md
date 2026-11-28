@@ -14,7 +14,8 @@ related:
   adrs: []
   files:
     - /docs/60-tracking/package-qualification-tabular-handoff-2026-11-27.md
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/13"
   issues: []
   branches:
     - users/samuelmcaravey/ty-10-package-qualification
