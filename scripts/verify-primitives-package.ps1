@@ -78,13 +78,14 @@ FastId id = FastId.From(42);
 Percentage percentage = Percentage.ParseScaled("12.5");
 Duration duration = Duration.Parse("PT1H");
 Money money = new(1.01m);
+BigDecimal exact = BigDecimal.Parse("12345678901234567890.0100");
 
-if (id.Value != 42 || percentage.Value != 0.125m || duration.Hours != 1 || money.ToWords() != "one dollar and one cent")
+if (id.Value != 42 || percentage.Value != 0.125m || duration.Hours != 1 || money.ToWords() != "one dollar and one cent" || exact.ToString() != "1234567890123456789001e-2")
 {
     return 1;
 }
 
-Console.WriteLine($"{id}|{percentage}|{duration}|{money.ToWords()}");
+Console.WriteLine($"{id}|{percentage}|{duration}|{money.ToWords()}|{exact}");
 return 0;
 '@ | Set-Content -LiteralPath (Join-Path $consumerRoot "Program.cs") -Encoding utf8
 

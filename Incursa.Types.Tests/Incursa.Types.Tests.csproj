@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Fixtures\bigdecimal-core-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Update="DotNet.ReproducibleBuilds.Isolated" Version="1.2.39" />
     <PackageReference Update="Meziantou.Analyzer" Version="2.0.257" />
     <PackageReference Update="Microsoft.CodeAnalysis.AnalyzerUtilities" Version="3.3.4" />
