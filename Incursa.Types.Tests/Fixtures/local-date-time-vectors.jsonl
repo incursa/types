@@ -1,0 +1,10 @@
+{"canonical":"0001-01-01T00:00:00.0000000"}
+{"canonical":"9999-12-31T23:59:59.9999999"}
+{"canonical":"2024-02-29T12:34:56.1234567"}
+{"canonical":"2000-02-29T00:00:00.0000001"}
+{"canonical":"1900-02-28T23:59:59.9999999"}
+{"canonical":"1970-01-01T00:00:00.0000000"}
+{"canonical":"2024-07-15T12:34:56.1234567","offsetMinutes":-420,"expectedUtc":"2024-07-15T19:34:56.1234567Z"}
+{"canonical":"2024-01-15T12:00:00.0000000","zoneId":"America/New_York","zoneOutcome":"2024-01-15T17:00:00.0000000Z"}
+{"canonical":"2024-11-03T01:30:00.0000000","zoneId":"America/New_York","zoneOutcome":"ambiguous"}
+{"canonical":"2024-03-10T02:30:00.0000000","zoneId":"America/New_York","zoneOutcome":"invalid"}

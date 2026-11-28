@@ -1,0 +1,8 @@
+{"input":"PT0S","units":0,"canonical":"PT0S"}
+{"input":"-PT0S","units":0,"canonical":"PT0S"}
+{"input":"PT0.0000001S","units":1,"canonical":"PT0.0000001S"}
+{"input":"-PT0.0000001S","units":-1,"canonical":"-PT0.0000001S"}
+{"input":"PT1.2345678S","units":12345678,"canonical":"PT1.2345678S"}
+{"input":"PT60.5000000S","units":605000000,"canonical":"PT60.5S"}
+{"input":"PT922337203685.4775807S","units":9223372036854775807,"canonical":"PT922337203685.4775807S"}
+{"input":"-PT922337203685.4775808S","units":-9223372036854775808,"canonical":"-PT922337203685.4775808S"}

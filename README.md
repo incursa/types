@@ -22,7 +22,8 @@ dotnet add package Incursa.Types.Primitives
 
 `Incursa.Types` references `Incursa.Types.Primitives`, so existing full-package
 consumers continue to receive `FastId`, `ShortCode`, `Maybe<T>`, `Money`,
-`Percentage`, `BigDecimal`, `Duration`, `Period`, and the backed-type interfaces. Their `Incursa` namespaces
+`Percentage`, `BigDecimal`, `ElapsedDuration`, `LocalDateTime`, `Duration`,
+`Period`, and the backed-type interfaces. Their `Incursa` namespaces
 are unchanged. Libraries that need only this dependency-free foundation can
 reference `Incursa.Types.Primitives` directly.
 
@@ -45,6 +46,11 @@ Console.WriteLine(exact); // 1234567890123456789001e-2
 var eighth = BigDecimal.One.DivideRounded(
     BigDecimal.Parse("8"), 2, BigDecimalRoundingMode.ToNearestTiesToEven);
 Console.WriteLine(eighth); // 12e-2
+
+// Exact elapsed units and zone-free local fields
+var elapsed = ElapsedDuration.Parse("-PT1.0000001S");
+var localFields = LocalDateTime.Parse("2024-02-29T12:34:56.1234567");
+var instant = localFields.WithOffset(TimeSpan.FromHours(-7));
 
 // FastId deterministic identifier
 record Order(FastId Id);
@@ -101,6 +107,8 @@ dotnet tool install --tool-path .tools dotnet-stryker --version 4.9.0
 * **Money** – Banker-rounded two-decimal monetary amounts with accounting/number formatting helpers.
 * **Percentage** – Percentage value object that truncates to two decimal places and supports arithmetic.
 * **BigDecimal** – dependency-free exact finite decimal with bounded parsing, canonical identity, named profiles, checked exact arithmetic, explicit rounding, and exact native conversions.
+* **ElapsedDuration** – signed exact 100-nanosecond elapsed units with checked arithmetic and canonical seconds text.
+* **LocalDateTime** – Gregorian local date/time fields at 100ns resolution with explicit offset or named-zone resolution.
 * **Duration** – ISO 8601 duration parser/formatter; supports fractional units and date arithmetic.
 * **Period** – ISO 8601 time interval composed of a start and `Duration`; uses half-open semantics `[start, end)`.
 * **RecurringPeriod** – Cron expression wrapper that materializes deterministic `Period` windows from the provided reference time.

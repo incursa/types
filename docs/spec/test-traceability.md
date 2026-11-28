@@ -65,6 +65,21 @@ This file maps behavioral specification clauses to concrete tests.
 | BIGDECIMAL-ROUND-001 | `docs/spec/types/BigDecimal.md` / Explicit rounding | `Incursa.Types.Tests.BigDecimalArithmeticTests.QuantizeImplementsEveryExplicitRoundingMode`; `DivideRoundedRequiresScaleAndExplicitMode`; `InvalidRoundingModeAndScaleFailExplicitly` | Implemented |
 | BIGDECIMAL-CONTEXT-001 | `docs/spec/types/BigDecimal.md` / Generic math compatibility | `Incursa.Types.Tests.BigDecimalArithmeticTests.ContextsAreImmutableAndOperatorsUseStableDefault`; `ContextClassifiesValueAndWorkingResourceFailures` | Implemented |
 
+## Exact temporal primitives
+
+| SPEC-ID | Spec Location | Test | Status |
+| --- | --- | --- | --- |
+| ELAPSED-MODEL-001 | `docs/spec/types/ElapsedDuration.md` / Canonical value model | `Incursa.Types.Tests.TemporalPrimitiveTests.ElapsedDurationVectorsPreserveExactUnitsAndCanonicalText`; `ElapsedDurationArithmeticIsCheckedAndOrderedByUnits` | Implemented |
+| ELAPSED-PARSE-001 | `docs/spec/types/ElapsedDuration.md` / Lexical profile | `Incursa.Types.Tests.TemporalPrimitiveTests.ElapsedDurationVectorsPreserveExactUnitsAndCanonicalText`; `ElapsedDurationRejectsNonExactCalendarOrOutOfRangeText` | Implemented |
+| ELAPSED-ARITH-001 | `docs/spec/types/ElapsedDuration.md` / Public API behavior | `Incursa.Types.Tests.TemporalPrimitiveTests.ElapsedDurationArithmeticIsCheckedAndOrderedByUnits` | Implemented |
+| ELAPSED-CONVERT-001 | `docs/spec/types/ElapsedDuration.md` / Public API behavior | `Incursa.Types.Tests.TemporalPrimitiveTests.ElapsedDurationRoundTripsTimeSpanExactly`; `ElapsedDurationFormattingAndJsonAreCanonical` | Implemented |
+| LOCALDT-MODEL-001 | `docs/spec/types/LocalDateTime.md` / Canonical value model | `Incursa.Types.Tests.TemporalPrimitiveTests.LocalDateTimeVectorsRoundTripCanonicalFields`; `LocalDateTimeComponentConstructorPreservesHundredNanosecondPrecision`; `LocalDateTimeOrdersFieldsWithoutHostTimezoneInterpretation` | Implemented |
+| LOCALDT-PARSE-001 | `docs/spec/types/LocalDateTime.md` / Input and validation | `Incursa.Types.Tests.TemporalPrimitiveTests.LocalDateTimeVectorsRoundTripCanonicalFields`; `LocalDateTimeRejectsInvalidNonCanonicalOrZonedText`; `LocalDateTimeRejectsDateTimeWithImplicitZoneSemantics` | Implemented |
+| LOCALDT-ARITH-001 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.TemporalPrimitiveTests.LocalDateTimeArithmeticUsesExactElapsedTicksAndChecksRange` | Implemented |
+| LOCALDT-OFFSET-001 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.TemporalPrimitiveTests.ExplicitOffsetResolutionPreservesFieldsAndDefinesInstant` | Implemented |
+| LOCALDT-ZONE-001 | `docs/spec/types/LocalDateTime.md` / Arithmetic and conversion | `Incursa.Types.Tests.TemporalPrimitiveTests.NamedZoneResolutionUsesPortableDstOutcomeFixture` | Implemented; Windows/Linux CI uses IANA zone ID |
+| LOCALDT-CONVERT-001 | `docs/spec/types/LocalDateTime.md` / Formatting and serialization | `Incursa.Types.Tests.TemporalPrimitiveTests.LocalDateTimeFormattingAndJsonAreCanonical`; `LocalDateTimeRejectsDateTimeWithImplicitZoneSemantics` | Implemented |
+
 ## Supporting Types
 
 | SPEC-ID | Spec Location | Test | Status |
