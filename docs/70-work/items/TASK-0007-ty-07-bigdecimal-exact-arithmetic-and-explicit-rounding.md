@@ -15,7 +15,8 @@ related:
     - /docs/40-decisions/ADR-0001-bigdecimal-exact-decimal-model.md
   files:
     - /docs/60-tracking/bigdecimal-baseline-benchmark-2026-11-27.md
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/10"
   issues: []
   branches:
     - users/samuelmcaravey/ty-07-bigdecimal-arithmetic
