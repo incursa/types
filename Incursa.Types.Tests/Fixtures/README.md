@@ -19,3 +19,9 @@ terminating divide, and truncated remainder. The arithmetic verifier extends
 `scripts/verify-bigdecimal-arithmetic-vectors.py` uses
 `fractions.Fraction`; runtime tests consume those
 results and separately compare compatible operations with `SqlDecimal`.
+
+`elapsed-duration-vectors.jsonl` records exact signed Int64 100-nanosecond
+boundaries and canonical seconds text. `local-date-time-vectors.jsonl` records
+the Gregorian year bounds, leap-day rules, and exact seven-digit local-field
+encoding. They are portable value/lexical fixtures with no host timezone
+dependency; zone behavior is exercised separately against explicit IANA data.

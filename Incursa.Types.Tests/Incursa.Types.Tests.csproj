@@ -19,6 +19,8 @@
   <ItemGroup>
     <None Update="Fixtures\bigdecimal-core-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Fixtures\bigdecimal-arithmetic-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures\elapsed-duration-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures\local-date-time-vectors.jsonl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

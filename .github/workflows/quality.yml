@@ -285,8 +285,8 @@ jobs:
       - name: Restore
         run: dotnet restore Incursa.Core.slnx
 
-      - name: Run platform timezone matrix
-        run: dotnet test Incursa.Core.slnx --configuration Release --filter "FullyQualifiedName~TimeZoneId"
+      - name: Run platform timezone and temporal matrix
+        run: dotnet test Incursa.Core.slnx --configuration Release --filter "FullyQualifiedName~TimeZoneId|FullyQualifiedName~TemporalPrimitiveTests"
 
       - name: Verify invariant-globalization failure contract
         env:

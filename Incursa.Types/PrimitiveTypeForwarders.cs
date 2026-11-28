@@ -15,6 +15,8 @@
 using System.Runtime.CompilerServices;
 
 [assembly: TypeForwardedTo(typeof(Incursa.Duration))]
+[assembly: TypeForwardedTo(typeof(Incursa.ElapsedDuration))]
+[assembly: TypeForwardedTo(typeof(Incursa.ElapsedDurationJsonConverter))]
 [assembly: TypeForwardedTo(typeof(Incursa.BigDecimal))]
 [assembly: TypeForwardedTo(typeof(Incursa.BigDecimalContext))]
 [assembly: TypeForwardedTo(typeof(Incursa.BigDecimalLimitException))]
@@ -51,6 +53,8 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(Incursa.INumberBackedType<,>))]
 [assembly: TypeForwardedTo(typeof(Incursa.IStringBackedType<>))]
 [assembly: TypeForwardedTo(typeof(Incursa.Maybe<>))]
+[assembly: TypeForwardedTo(typeof(Incursa.LocalDateTime))]
+[assembly: TypeForwardedTo(typeof(Incursa.LocalDateTimeJsonConverter))]
 [assembly: TypeForwardedTo(typeof(Incursa.Money))]
 [assembly: TypeForwardedTo(typeof(Incursa.MoneyExtensions))]
 [assembly: TypeForwardedTo(typeof(Incursa.Percentage))]
