@@ -13,7 +13,8 @@ related:
   adrs:
     - /docs/40-decisions/ADR-0001-bigdecimal-exact-decimal-model.md
   files: []
-  prs: []
+  prs:
+    - "https://github.com/incursa/types/pull/8"
   issues: []
   branches:
     - users/samuelmcaravey/ty-05-bigdecimal-design
