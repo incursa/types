@@ -1,7 +1,7 @@
 ---
 id: TASK-0008
 type: task
-status: in-progress
+status: done
 priority: critical
 owner: platform
 created: 2026-11-27
@@ -72,8 +72,11 @@ requirement lifecycle state.
 - Warn-as-error deterministic build, formatting, Workbench strict validation,
   type-spec verification, and diff checks pass.
 - Package-only nupkg restore/build/run consumes both primitives and passes with
-  zero runtime package dependencies. Connected Windows/Linux CI remains to be
-  recorded.
+  zero runtime package dependencies.
+- PR #11 connected validation passed Workbench, Windows/Ubuntu combined
+  timezone/temporal matrix, warn-as-error build, 456 tests, coverage gates,
+  package-only consumer, deterministic packaging, both mutation scopes, and
+  aggregate Quality Report.
 
 ## Acceptance criteria
 
@@ -81,5 +84,5 @@ requirement lifecycle state.
   DST ambiguity, and invalid local times.
 - [x] Primitives API is independently consumable and matches the documented
   Tabular exact scalar profiles.
-- [ ] Requirements map to code/tests or explicit TY-09/TY-10 deferral and
+- [x] Requirements map to code/tests or explicit TY-09/TY-10 deferral and
   Release solution plus connected CI results are recorded.
