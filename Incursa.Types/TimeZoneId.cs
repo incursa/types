@@ -74,7 +74,7 @@ public readonly record struct TimeZoneId : IParsable<TimeZoneId>
     {
         try
         {
-            return TimeZoneInfo.FindSystemTimeZoneById(id);
+            return ResolveSystemTimeZone(id);
         }
         catch (TimeZoneNotFoundException ex) when (RequiresUnavailableIanaData(id))
         {
@@ -92,6 +92,28 @@ public readonly record struct TimeZoneId : IParsable<TimeZoneId>
         {
             throw new PlatformNotSupportedException($"System time zone data for '{id}' is not accessible on this host.", ex);
         }
+    }
+
+    private static TimeZoneInfo ResolveSystemTimeZone(string id)
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById(id);
+        }
+        catch (TimeZoneNotFoundException) when (TryGetCanonicalIanaAlias(id, out string? canonicalIanaId))
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById(canonicalIanaId);
+        }
+    }
+
+    private static bool TryGetCanonicalIanaAlias([NotNullWhen(true)] string? id, [NotNullWhen(true)] out string? canonicalIanaId)
+    {
+        canonicalIanaId = null;
+        return id is not null &&
+               id.Contains('/', StringComparison.Ordinal) &&
+               TimeZoneInfo.TryConvertIanaIdToWindowsId(id, out string? windowsId) &&
+               TimeZoneInfo.TryConvertWindowsIdToIanaId(windowsId, out canonicalIanaId) &&
+               !string.Equals(id, canonicalIanaId, StringComparison.OrdinalIgnoreCase);
     }
 
     private static string NormalizeIdentifier(string originalId, TimeZoneInfo info)

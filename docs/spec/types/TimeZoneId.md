@@ -40,6 +40,9 @@ Represents a valid time zone identifier, supporting Windows/IANA forms.
 ## Normalization Rules
 - Windows IDs normalize to IANA when available.
 - IANA inputs preserve caller-provided identifier text.
+- An IANA alias recognized by platform CLDR data can resolve through its
+  canonical IANA target when the host omits the alias link file; the supplied
+  alias text is still preserved.
 - `UTC` follows the Windows-to-IANA mapping and canonicalizes to `Etc/UTC`.
 - No host-local fallback is allowed. If a resolved Windows identity cannot be
   mapped to IANA, construction fails explicitly.

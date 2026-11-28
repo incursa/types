@@ -57,6 +57,9 @@ does not promote or otherwise mutate the requirements.
 - Canonicalize Windows identifiers through
   `TimeZoneInfo.TryConvertWindowsIdToIanaId`; preserve accepted IANA identifiers
   and aliases exactly as supplied.
+- If a host omits an accepted IANA alias link file, resolve its platform CLDR
+  mapping through IANA-to-Windows-to-canonical-IANA conversion while retaining
+  the caller's alias as `CanonicalId`.
 - Report unavailable ICU/CLDR data with `PlatformNotSupportedException`,
   invalid input with `ArgumentException`, corrupt data with
   `InvalidTimeZoneException`, and inaccessible host data with an explicit
@@ -84,8 +87,9 @@ does not promote or otherwise mutate the requirements.
 - Full Release solution: 279 passed, 0 failed, 0 skipped.
 - Coverage: 73.67% line and 60.13% branch overall, above the 65%/50%
   gates.
-- Rich Types mutation gate (`JsonContext`, `MonthOnly`, `TimeZoneId`): 64.15%
-  (68 killed, 2 survived, 0 timeouts/errors), above the 35% break threshold.
+- Rich Types mutation gate (`JsonContext`, `MonthOnly`, `TimeZoneId`): 62.16%
+  (69 killed, 5 survived, 0 timeouts/errors), above the 35% break threshold
+  after the Linux alias-resolution correction.
 - The packed full-package nuspec and restore assets contain no
   TimeZoneConverter dependency. Connected Windows/Linux CI evidence remains
   pending until the branch is pushed.
